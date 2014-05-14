@@ -6,7 +6,7 @@
 # T1 Micro Instance ID: i-ee9f1bbe
 
 echo 'Updating packages ...'
-sudo yum update
+sudo yum -y update
 
 echo 'Installing nginx...'
 yum -y install nginx
@@ -51,7 +51,7 @@ echo 'Making sure that nginx starts on startup'
 /sbin/chkconfig nginx on
 
 echo 'Removing apache...'
-yum remove httpd
+yum -y remove httpd
 
 echo 'Starting nginx'
 sudo service nginx start
@@ -151,7 +151,7 @@ echo 'Making sure that play starts on startup'
 /sbin/chkconfig play on
 
 echo 'Removing tomcat...'
-yum remove tomcat7
+yum -y remove tomcat7
 
 echo 'Downloading sample test app for play'
 wget -P /var/app/ https://playframework-assets.s3.amazonaws.com/playapp.zip
