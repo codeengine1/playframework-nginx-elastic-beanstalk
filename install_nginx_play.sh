@@ -84,18 +84,25 @@ APP="playapp"
 APP_PATH="/var/app/$APP"
 
 start() {
-	rm -fR $APP_PATH/*
-	unzip "$APP_PATH.zip" -d $APP_PATH
+  if [ -f $APP_PATH.zip ]; then
+    rm -fR $APP_PATH/*
+    unzip "$APP_PATH.zip" -d $APP_PATH
+    rm "$APP_PATH.zip"
+    ln -s $APP_PATH/*/ /var/app/current
+  fi
+
 	BIN=`find $APP_PATH/*/bin -not -name "*.bat" -not -type d`
-    $BIN -J-Xms64M -J-Xmx256m &
+  $BIN -J-Xms64M -J-Xmx256m -Dpidfile.path=/var/run/play.pid >/dev/null 2>&1 &
+  return 0
 }
 
 stop() {
-    kill `cat $APP_PATH/*/RUNNING_PID`
+    kill `cat /var/run/play.pid`
+    return 0
 }
 
 status() {
-  if [ -f $APP_PATH/*/RUNNING_PID ]; then
+  if [ -f /var/run/play.pid ]; then
     success
     exit 0;
   else 
@@ -106,14 +113,11 @@ status() {
 
 case "$1" in
   start)
-    echo "Starting $APP"
     start
-    echo "$APP started."
+    exit 0
     ;;
   stop)
-    echo "Stopping $APP"
     stop
-    echo "$APP stopped."
     ;;
   restart)
     echo  "Restarting $APP."
@@ -147,4 +151,7 @@ wget -P /var/app/ https://playframework-assets.s3.amazonaws.com/playapp.zip
 
 echo 'Starting up play'
 sudo service play start
+
+# TODO: add in monit.conf
+sudo service monit restart
 
