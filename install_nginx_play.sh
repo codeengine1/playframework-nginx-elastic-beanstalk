@@ -1,6 +1,12 @@
 #!/bin/sh
 
+# You must run this as root for it to work
 # This has been tested on a T1 Micro Instance using AMI ID : amzn-ami-pv-2014.03.1.x86_64-ebs (ami-fb8e9292)
+
+# T1 Micro Instance ID: i-ee9f1bbe
+
+echo 'Updating packages ...'
+sudo yum update
 
 echo 'Installing nginx...'
 yum -y install nginx
@@ -56,6 +62,7 @@ echo 'Creating app directory'
 mkdir /var/app
 
 echo 'Downloading Playframework'
+cd /opt/
 wget -P /opt/ https://playframework-assets.s3.amazonaws.com/play-2.2.3.zip
 unzip /opt/play-2.2.3.zip
 rm -f /opt/play-2.2.3.zip
@@ -152,6 +159,33 @@ wget -P /var/app/ https://playframework-assets.s3.amazonaws.com/playapp.zip
 echo 'Starting up play'
 sudo service play start
 
-# TODO: add in monit.conf
+echo 'Reconfiguring monit ... '
+
+echo 'set daemon 30
+set httpd port 2812 and
+    use address localhost
+    allow localhost
+
+#play
+check process play with pidfile /var/run/play.pid
+  start program = "/etc/init.d/play start"
+  stop program = "/etc/init.d/play stop"
+
+#nginx
+check process nginx with pidfile /var/run/nginx.pid
+  start program = "/etc/init.d/nginx start"
+  stop program = "/etc/init.d/nginx stop"' > /etc/monit.d/monit.conf
+
+echo 'Restarting monit service ...'
+
 sudo service monit restart
+
+echo 'Configuring Elastic Beanstalk for Playframework deployment ... '
+cd /home/ec2-user
+wget -P /home/ec2-user https://playframework-assets.s3.amazonaws.com/elasticbeanstalk.zip
+unzip /home/ec2-user/elasticbeanstalk.zip
+rm /home/ec2-user/elasticbeanstalk.zip
+rm -fR /opt/elasticbeanstalk/hooks
+cp -a /home/ec2-user/elasticbeanstalk/hooks /opt/elasticbeanstalk/
+
 
