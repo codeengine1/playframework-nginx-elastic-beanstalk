@@ -18,8 +18,5 @@ set -xe
 
 if [[ "$EB_SYSTEM_STARTUP" != "true" ]];
 then
-  /usr/bin/monit unmonitor play
-  /etc/init.d/play stop
-  /etc/init.d/play start
-  /usr/bin/monit monitor play
+  /etc/init.d/play restart
 fi

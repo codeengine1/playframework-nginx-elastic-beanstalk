@@ -52,6 +52,9 @@ sudo service nginx start
 
 echo 'Nginx is installed'
 
+echo 'Creating app directory'
+mkdir /var/app
+
 echo 'Downloading Playframework'
 wget -P /opt/ https://playframework-assets.s3.amazonaws.com/play-2.2.3.zip
 unzip /opt/play-2.2.3.zip
@@ -78,7 +81,7 @@ echo '#! /bin/sh
 . /etc/rc.d/init.d/functions
 
 APP="playapp"
-APP_PATH="/opt/app/$APP"
+APP_PATH="/var/app/$APP"
 
 start() {
 	rm -fR $APP_PATH/*
@@ -94,10 +97,10 @@ stop() {
 status() {
   if [ -f $APP_PATH/*/RUNNING_PID ]; then
     success
-    exit "0";
+    exit 0;
   else 
     success
-    exit "3";
+    exit 1;
   fi
 }
 
@@ -140,7 +143,7 @@ echo 'Removing tomcat...'
 yum remove tomcat7
 
 echo 'Downloading sample test app for play'
-wget -P /opt/app/ https://playframework-assets.s3.amazonaws.com/playapp.zip
+wget -P /var/app/ https://playframework-assets.s3.amazonaws.com/playapp.zip
 
 echo 'Starting up play'
 sudo service play start

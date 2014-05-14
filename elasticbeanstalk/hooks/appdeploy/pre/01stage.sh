@@ -16,4 +16,4 @@
 
 set -xe
 
-cp /opt/elasticbeanstalk/deploy/appsource/source_bundle /opt/app/playapp.zip
+cp /opt/elasticbeanstalk/deploy/appsource/source_bundle /var/app/playapp.zip
