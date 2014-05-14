@@ -75,6 +75,8 @@ echo '#! /bin/sh
 # Description:
 ### END INIT INFO
 
+. /etc/rc.d/init.d/functions
+
 APP="playapp"
 APP_PATH="/opt/app/$APP"
 
@@ -87,6 +89,16 @@ start() {
 
 stop() {
     kill `cat $APP_PATH/*/RUNNING_PID`
+}
+
+status() {
+  if [ `cat $APP_PATH/*/RUNNING_PID` ]; then
+    success
+    exit "0";
+  else 
+    success
+    exit "3";
+  fi
 }
 
 case "$1" in
@@ -107,6 +119,10 @@ case "$1" in
     start
     echo "$APP restarted."
     ;;
+  status)
+    echo  "Checking status"
+    status
+    ;;
   *)
     N=/etc/init.d/play.$APP
     echo "Usage: $N {start|stop|restart}" >&2
@@ -124,7 +140,7 @@ echo 'Removing tomcat...'
 yum remove tomcat7
 
 echo 'Downloading sample test app for play'
-wget -P /opt/ https://playframework-assets.s3.amazonaws.com/playapp.zip
+wget -P /opt/app/ https://playframework-assets.s3.amazonaws.com/playapp.zip
 
 echo 'Starting up play'
 sudo service play start

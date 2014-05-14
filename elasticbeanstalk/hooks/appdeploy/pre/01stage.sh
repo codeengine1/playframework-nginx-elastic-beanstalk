@@ -16,4 +16,4 @@
 
 set -xe
 
-cp /tmp/deployment/config/tomcat7 /etc/sysconfig/tomcat7
+cp /opt/elasticbeanstalk/deploy/appsource/source_bundle /opt/app/playapp.zip
