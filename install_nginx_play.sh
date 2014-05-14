@@ -92,7 +92,7 @@ stop() {
 }
 
 status() {
-  if [ `cat $APP_PATH/*/RUNNING_PID` ]; then
+  if [ -f $APP_PATH/*/RUNNING_PID ]; then
     success
     exit "0";
   else 
