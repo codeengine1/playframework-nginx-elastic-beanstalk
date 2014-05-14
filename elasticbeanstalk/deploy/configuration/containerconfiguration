@@ -1,0 +1,26 @@
+{
+    "system": {
+        "LogPublicationControl": "false",
+        "AWSEBAgentId": "MXCrpECLSLK2BuYnhpaZDYneQ4uMMZdfJSmH3UML8gZ5AnvConnlkqMS3Ur5u0Vulw8eVGgEU1oQ9R6j1MxWqACHhmyhwnBEuB1Zl7Ej4HMMmYgxO4Ihk28A2Anfskrlugyt3jsnflGTEiEpLympM6KWDD48PZB48z1BYXhPpW194G7w5BePWhQNSx8cIzWyljqxJ4TXhomOOT7u4l52F8p5aurVPEWfk5RavB4fZBYaoJLHjaSuRohZ0R2UppC",
+        "AWSEBReferrerId": "GrXdiqzpM43pU3vWmY6SMp3pD0slqKZytvgw3Ez2F2HVQRYawRO4Je83slMCz0hSp8nvM7D7pGwKLZ6xchDs5ZKfGCjWrj9E7rZb63ECnWTDoET7lLSqbpQ7T5WJzkv7c9BwoAQyk3WxJ8mIoOim3iaN99lDTh5sGlqNBHpCb5UwqGauW7tWk87ukOUgvsit4avu7la1ZBRMFbx66OGRZrEzSpx87LdmtG2GN7Nhc4FPhK3d9S3OL8aXe9SxyrN"
+    },
+    "tomcat": {
+        "instanceport": "80",
+        "jvmoptions": [
+            "Xms=256m",
+            "Xmx=256m",
+            "XX:MaxPermSize=64m",
+            "JVM Options="
+        ],
+        "env": [
+            "AWS_ACCESS_KEY_ID=",
+            "AWS_SECRET_KEY=",
+            "JDBC_CONNECTION_STRING=",
+            "PARAM1=",
+            "PARAM2=",
+            "PARAM3=",
+            "PARAM4=",
+            "PARAM5="
+        ]
+    }
+}
