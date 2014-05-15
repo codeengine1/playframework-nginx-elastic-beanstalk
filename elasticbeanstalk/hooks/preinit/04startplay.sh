@@ -17,4 +17,9 @@
 
 set -xe
 
-/usr/bin/monit start httpd  
+if /etc/init.d/play status
+then
+  /etc/init.d/play stop
+fi
+
+/etc/init.d/play start

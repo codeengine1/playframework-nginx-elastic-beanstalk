@@ -68,8 +68,10 @@ unzip /opt/play-2.2.3.zip
 rm -f /opt/play-2.2.3.zip
 
 echo 'Adding Play to the PATH ...'
+export PATH=$PATH:/opt/play-2.2.3
 echo '#! /bin/sh
-export PATH=$PATH:/opt/play-2.2.3' > /etc/profile.d/play.sh
+export PATH=$PATH:/opt/play-2.2.3
+' > /etc/profile.d/play.sh
 chmod +x /etc/profile.d/play.sh
 
 echo 'Test script for Elastic Beanstalk ...'
@@ -79,9 +81,6 @@ echo '#! /bin/sh
 /opt/elasticbeanstalk/hooks/appdeploy/post/01start.sh
 ' > /etc/init.d/ebdeploy.sh
 chmod +x /etc/init.d/ebdeploy.sh
-
-
-source /etc/profile.d/play.sh
 
 echo 'Adding play startup script'
 

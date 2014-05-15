@@ -18,8 +18,6 @@ set -xe
 
 if [[ "$EB_SYSTEM_STARTUP" != "true" ]];
 then
-  /usr/bin/monit unmonitor tomcat
-  /etc/init.d/tomcat7 stop
-  /etc/init.d/tomcat7 start
-  /usr/bin/monit monitor tomcat
+  /etc/init.d/play stop
+  /etc/init.d/play start
 fi
