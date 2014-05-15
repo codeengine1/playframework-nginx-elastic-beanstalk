@@ -103,16 +103,26 @@ APP="playapp"
 APP_PATH="/var/app/$APP"
 
 start() {
-  if [ -f $APP_PATH.zip ]; then
-    rm -fR $APP_PATH/*
-    unzip "$APP_PATH.zip" -d $APP_PATH
-    rm "$APP_PATH.zip"
-    unlink /var/app/current
-    ln -s $APP_PATH/*/ /var/app/current
+
+  cp /opt/elasticbeanstalk/deploy/appsource/source_bundle /var/app/playapp.zip
+  rm -fR $APP_PATH/*
+  unzip "$APP_PATH.zip" -d $APP_PATH
+  rm "$APP_PATH.zip"
+  unlink /var/app/current
+  ln -s $APP_PATH/*/ /var/app/current
+
+  CONFIG_FILE = "application.conf"
+
+  if [ -f $APP_PATH/*/conf/rc.application.conf ]; then
+    CONFIG_FILE = "rc.application.conf"
+  fi
+
+  if [ -f $APP_PATH/*/conf/live.application.conf ]; then
+    CONFIG_FILE = "live.application.conf"
   fi
 
 	BIN=`find $APP_PATH/*/bin -not -name "*.bat" -not -type d`
-  $BIN -J-Xms64M -J-Xmx256m -Dpidfile.path=/var/run/play.pid >/dev/null 2>&1 &
+  $BIN -J-Xms64M -J-Xmx256m -Dpidfile.path=/var/run/play.pid -Dconfig.file=/var/app/current/conf/$CONFIG_FILE >/dev/null 2>&1 &
   /usr/bin/monit monitor play
   return 0
 }
