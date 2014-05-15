@@ -61,14 +61,26 @@ echo 'Nginx is installed'
 echo 'Creating app directory'
 mkdir /var/app
 
-echo 'Downloading Playframework'
+echo 'Downloading Playframework ...'
 cd /opt/
 wget -P /opt/ https://playframework-assets.s3.amazonaws.com/play-2.2.3.zip
 unzip /opt/play-2.2.3.zip
 rm -f /opt/play-2.2.3.zip
 
-echo 'Adding Play to the PATH'
-echo 'export PATH=$PATH:/opt/play-2.2.3' > /etc/profile.d/play.sh
+echo 'Adding Play to the PATH ...'
+echo '#! /bin/sh
+export PATH=$PATH:/opt/play-2.2.3' > /etc/profile.d/play.sh
+chmod +x /etc/profile.d/play.sh
+
+echo 'Startup script for Elastic Beanstalk ...'
+echo '#! /bin/sh
+/opt/elasticbeanstalk/hooks/appdeploy/pre/01stage.sh
+/opt/elasticbeanstalk/hooks/appdeploy/enact/01stop.sh
+/opt/elasticbeanstalk/hooks/appdeploy/post/01start.sh
+' > /etc/profile.d/ebstart.sh
+chmod +x /etc/profile.d/ebstart.sh
+
+
 source /etc/profile.d/play.sh
 
 echo 'Adding play startup script'
@@ -95,25 +107,26 @@ start() {
     rm -fR $APP_PATH/*
     unzip "$APP_PATH.zip" -d $APP_PATH
     rm "$APP_PATH.zip"
+    unlink /var/app/current
     ln -s $APP_PATH/*/ /var/app/current
   fi
 
 	BIN=`find $APP_PATH/*/bin -not -name "*.bat" -not -type d`
   $BIN -J-Xms64M -J-Xmx256m -Dpidfile.path=/var/run/play.pid >/dev/null 2>&1 &
+  /usr/bin/monit monitor play
   return 0
 }
 
 stop() {
+    /usr/bin/monit unmonitor play
     kill `cat /var/run/play.pid`
     return 0
 }
 
 status() {
   if [ -f /var/run/play.pid ]; then
-    success
     exit 0;
   else 
-    success
     exit 1;
   fi
 }
@@ -187,5 +200,9 @@ unzip /home/ec2-user/elasticbeanstalk.zip
 rm /home/ec2-user/elasticbeanstalk.zip
 rm -fR /opt/elasticbeanstalk/hooks
 cp -a /home/ec2-user/elasticbeanstalk/hooks /opt/elasticbeanstalk/
+rm -fR /opt/elasticbeanstalk/tasks
+cp -a /home/ec2-user/elasticbeanstalk/tasks /opt/elasticbeanstalk/
+rm -fR /opt/elasticbeanstalk/containerfiles
+cp -a /home/ec2-user/elasticbeanstalk/containerfiles /opt/elasticbeanstalk/
 
 

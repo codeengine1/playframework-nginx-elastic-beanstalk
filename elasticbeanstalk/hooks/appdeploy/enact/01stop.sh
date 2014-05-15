@@ -18,6 +18,5 @@ set -xe
 
 if /etc/init.d/play status
 then
-  /usr/bin/monit unmonitor play
   /etc/init.d/play stop
 fi
