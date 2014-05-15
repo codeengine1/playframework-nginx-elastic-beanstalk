@@ -72,13 +72,13 @@ echo '#! /bin/sh
 export PATH=$PATH:/opt/play-2.2.3' > /etc/profile.d/play.sh
 chmod +x /etc/profile.d/play.sh
 
-echo 'Startup script for Elastic Beanstalk ...'
+echo 'Test script for Elastic Beanstalk ...'
 echo '#! /bin/sh
 /opt/elasticbeanstalk/hooks/appdeploy/pre/01stage.sh
 /opt/elasticbeanstalk/hooks/appdeploy/enact/01stop.sh
 /opt/elasticbeanstalk/hooks/appdeploy/post/01start.sh
-' > /etc/profile.d/ebstart.sh
-chmod +x /etc/profile.d/ebstart.sh
+' > /etc/init.d/ebdeploy.sh
+chmod +x /etc/init.d/ebdeploy.sh
 
 
 source /etc/profile.d/play.sh
@@ -111,14 +111,14 @@ start() {
   unlink /var/app/current
   ln -s $APP_PATH/*/ /var/app/current
 
-  CONFIG_FILE = "application.conf"
+  CONFIG_FILE="application.conf"
 
   if [ -f $APP_PATH/*/conf/rc.application.conf ]; then
-    CONFIG_FILE = "rc.application.conf"
+    CONFIG_FILE="rc.application.conf"
   fi
 
   if [ -f $APP_PATH/*/conf/live.application.conf ]; then
-    CONFIG_FILE = "live.application.conf"
+    CONFIG_FILE="live.application.conf"
   fi
 
 	BIN=`find $APP_PATH/*/bin -not -name "*.bat" -not -type d`
@@ -128,10 +128,21 @@ start() {
 }
 
 stop() {
-    /usr/bin/monit unmonitor play
-    kill `cat /var/run/play.pid`
-    return 0
+  PLAY_PROCESS=""
+
+  if [ -f /var/run/play.pid ]; then
+    PLAY_PROCESS=$(cat /var/run/play.pid)
+  else 
+    PLAY_PROCESS=$(ps aux | grep '[p]lay' | awk '{print $2}')
+  fi
+
+  if [ "$PLAY_PROCESS" != "" ]; then
+    kill $PLAY_PROCESS
+  fi
+
+  return 0
 }
+
 
 status() {
   if [ -f /var/run/play.pid ]; then
@@ -182,27 +193,6 @@ wget -P /var/app/ https://playframework-assets.s3.amazonaws.com/playapp.zip
 echo 'Starting up play'
 sudo service play start
 
-echo 'Reconfiguring monit ... '
-
-echo 'set daemon 30
-set httpd port 2812 and
-    use address localhost
-    allow localhost
-
-#play
-check process play with pidfile /var/run/play.pid
-  start program = "/etc/init.d/play start"
-  stop program = "/etc/init.d/play stop"
-
-#nginx
-check process nginx with pidfile /var/run/nginx.pid
-  start program = "/etc/init.d/nginx start"
-  stop program = "/etc/init.d/nginx stop"' > /etc/monit.d/monit.conf
-
-echo 'Restarting monit service ...'
-
-sudo service monit restart
-
 echo 'Configuring Elastic Beanstalk for Playframework deployment ... '
 cd /home/ec2-user
 wget -P /home/ec2-user https://playframework-assets.s3.amazonaws.com/elasticbeanstalk.zip
@@ -215,4 +205,7 @@ cp -a /home/ec2-user/elasticbeanstalk/tasks /opt/elasticbeanstalk/
 rm -fR /opt/elasticbeanstalk/containerfiles
 cp -a /home/ec2-user/elasticbeanstalk/containerfiles /opt/elasticbeanstalk/
 
-
+echo 'Reconfiguring monit ... '
+cp -f /opt/elasticbeanstalk/containerfiles/monit.conf /etc/monit.d/monit.conf
+echo 'Restarting monit service ...'
+sudo service monit restart
