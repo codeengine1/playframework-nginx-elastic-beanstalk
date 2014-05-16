@@ -16,8 +16,9 @@
 
 set -xe
 
-if [[ "$EB_SYSTEM_STARTUP" != "true" ]];
+if /etc/init.d/play status
 then
   /etc/init.d/play stop
-  /etc/init.d/play start
 fi
+
+/etc/init.d/play start

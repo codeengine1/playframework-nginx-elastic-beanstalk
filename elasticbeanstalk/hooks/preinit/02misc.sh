@@ -16,14 +16,3 @@
 
 set -xe
 
-function preinit() {
-
-}
-
-if [[ -n "$EB_FIRST_RUN" ]];
-then
-  echo "Running preinit"
-  preinit
-else
-  echo "Running preinit-reboot"
-fi

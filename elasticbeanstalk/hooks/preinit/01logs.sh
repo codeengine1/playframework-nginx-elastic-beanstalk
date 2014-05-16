@@ -23,10 +23,8 @@ mkdir -p /opt/elasticbeanstalk/tasks/systemtaillogs.d
 mkdir -p /opt/elasticbeanstalk/tasks/taillogs.d
 
 
-cat > /opt/elasticbeanstalk/tasks/taillogs.d/tomcat7.conf <<EOLTAILLOG
-/var/log/tomcat7/*.out
-/var/log/tomcat7/*.log
-/var/log/tomcat7/*.txt
+cat > /opt/elasticbeanstalk/tasks/taillogs.d/play.conf <<EOLTAILLOG
+/var/app/current/logs/*.log
 EOLTAILLOG
 
 cat > /opt/elasticbeanstalk/tasks/taillogs.d/httpd.conf <<EOLTAILLOG
@@ -34,10 +32,8 @@ cat > /opt/elasticbeanstalk/tasks/taillogs.d/httpd.conf <<EOLTAILLOG
 EOLTAILLOG
 
 
-cat > /opt/elasticbeanstalk/tasks/systemtaillogs.d/tomcat7.conf <<EOLSYSTAILLOG
-/var/log/tomcat7/*.out
-/var/log/tomcat7/*.log
-/var/log/tomcat7/*.txt
+cat > /opt/elasticbeanstalk/tasks/systemtaillogs.d/play.conf <<EOLSYSTAILLOG
+/var/app/current/logs/*.log
 EOLSYSTAILLOG
 
 cat > /opt/elasticbeanstalk/tasks/systemtaillogs.d/httpd.conf <<EOLSYSTAILLOG
@@ -45,8 +41,8 @@ cat > /opt/elasticbeanstalk/tasks/systemtaillogs.d/httpd.conf <<EOLSYSTAILLOG
 EOLSYSTAILLOG
 
 
-cat > /opt/elasticbeanstalk/tasks/bundlelogs.d/tomcat7.conf <<EOLBUNDLELOG
-/var/log/tomcat7/*
+cat > /opt/elasticbeanstalk/tasks/bundlelogs.d/play.conf <<EOLBUNDLELOG
+/var/app/current/logs/*.log
 EOLBUNDLELOG
 
 cat > /opt/elasticbeanstalk/tasks/bundlelogs.d/httpd.conf <<EOLBUNDLELOG
@@ -54,22 +50,17 @@ cat > /opt/elasticbeanstalk/tasks/bundlelogs.d/httpd.conf <<EOLBUNDLELOG
 EOLBUNDLELOG
 
 
-cat > /opt/elasticbeanstalk/tasks/publishlogs.d/tomcat7.conf <<EOLPUBLOG
-/var/log/tomcat7/*.gz
+cat > /opt/elasticbeanstalk/tasks/publishlogs.d/play.conf <<EOLPUBLOG
+/var/app/current/logs/*.gz
 EOLPUBLOG
 
 cat > /opt/elasticbeanstalk/tasks/publishlogs.d/httpd.conf <<EOLPUBLOG
 /var/log/httpd/*.gz
 EOLPUBLOG
 
-
-echo "Removing tomcat internal log rotation."
-/bin/sed -i -e 's|prefix="localhost_access_log.*$|prefix="localhost_access_log" suffix=".txt" rotatable="false"|' /etc/tomcat7/server.xml
-
-
 # Tomcat logging
 cat > /etc/logrotate.conf.elasticbeanstalk <<EOLOGROTATE
-/var/log/tomcat7/catalina.out /var/log/tomcat7/localhost_access_log.txt {
+/var/app/current/logs/ {
     size 1M
     missingok
     rotate 5
@@ -116,14 +107,6 @@ test -x /usr/sbin/logrotate || exit 0
 EOLOGCRON2
 chmod 755 /etc/cron.hourly/logrotate-elasticbeanstalk-httpd
 
-echo "Removing default tomcat logrotate."
-/bin/rm -f /etc/logrotate.d/tomcat7
-
 echo "Removing default httpd logrotate."
 /bin/rm -f /etc/logrotate.d/httpd
 
-echo "Removing extra log file."
-sed -i '/.handlers = 1catalina.org.apache.juli.FileHandler, java.util.logging.ConsoleHandle/c \
-.handlers = java.util.logging.ConsoleHandler' /etc/tomcat7/logging.properties
-sed -i '/org.apache.catalina.core.ContainerBase.\[Catalina\].\[localhost\].handlers = 2localhost.org.apache.juli.FileHandler/c \
-org.apache.catalina.core.ContainerBase.[Catalina].[localhost].handlers = java.util.logging.ConsoleHandler' /etc/tomcat7/logging.properties

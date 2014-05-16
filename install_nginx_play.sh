@@ -63,7 +63,7 @@ mkdir /var/app
 
 echo 'Downloading Playframework ...'
 cd /opt/
-wget -P /opt/ https://playframework-assets.s3.amazonaws.com/play-2.2.3.zip
+wget -P /opt/ http://playframework-assets.s3.amazonaws.com/play-2.2.3.zip
 unzip /opt/play-2.2.3.zip
 rm -f /opt/play-2.2.3.zip
 
@@ -187,14 +187,16 @@ echo 'Removing tomcat...'
 yum -y remove tomcat7
 
 echo 'Downloading sample test app for play'
-wget -P /var/app/ https://playframework-assets.s3.amazonaws.com/playapp.zip
+cd /var/app
+wget -P /var/app/ http://playframework-assets.s3.amazonaws.com/playapp.zip
+cp /var/app/playapp.zip /opt/elasticbeanstalk/deploy/appsource/source_bundle
 
 echo 'Starting up play'
 sudo service play start
 
 echo 'Configuring Elastic Beanstalk for Playframework deployment ... '
 cd /home/ec2-user
-wget -P /home/ec2-user https://playframework-assets.s3.amazonaws.com/elasticbeanstalk.zip
+wget -P /home/ec2-user http://playframework-assets.s3.amazonaws.com/elasticbeanstalk.zip
 unzip /home/ec2-user/elasticbeanstalk.zip
 rm /home/ec2-user/elasticbeanstalk.zip
 rm -fR /opt/elasticbeanstalk/hooks
@@ -208,3 +210,4 @@ echo 'Reconfiguring monit ... '
 cp -f /opt/elasticbeanstalk/containerfiles/monit.conf /etc/monit.d/monit.conf
 echo 'Restarting monit service ...'
 sudo service monit restart
+
