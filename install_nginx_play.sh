@@ -12,7 +12,7 @@ echo 'Installing nginx...'
 yum -y install nginx
 
 echo 'Fixing nginx configuration'
-sed -i 's/worker_processes  1;/worker_processes  4;/g' /etc/nginx/nginx.conf
+sed -i 's/worker_processes  1;/worker_processes  2;/g' /etc/nginx/nginx.conf
 rm -f /etc/nginx/conf.d/virtual.conf
 
 echo 'Creating configuration files'
