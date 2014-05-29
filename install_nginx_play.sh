@@ -37,7 +37,16 @@ echo 'server {
  error_log /var/log/httpd/elasticbeanstalk-error_log;
 
  #set the default location
+ location /assets/ {
+  expires max;
+  add_header Cache-Control public;
+  proxy_pass         http://127.0.0.1:9000/assets/;
+ }
+
  location / {
+  add_header Cache-Control "no-cache, no-store, must-revalidate";
+  add_header Pragma no-cache;
+  expires epoch;
   proxy_pass         http://127.0.0.1:9000/;
  }
 
