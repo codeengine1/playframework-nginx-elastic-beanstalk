@@ -44,7 +44,7 @@ echo 'server {
  }
 
  location / {
-  add_header Cache-Control "no-cache, no-store, must-revalidate";
+  add_header Cache-Control "no-store, must-revalidate";
   add_header Pragma no-cache;
   expires epoch;
   proxy_pass         http://127.0.0.1:9000/;
