@@ -8,6 +8,19 @@
 echo 'Updating packages ...'
 sudo yum -y update
 
+echo 'Installing Oracle Java v7 ...'
+cd /opt/
+wget http://playframework-assets.s3.amazonaws.com/US_export_policy.jar
+wget http://playframework-assets.s3.amazonaws.com/local_policy.jar
+wget http://playframework-assets.s3.amazonaws.com/jdk-7u65-linux-x64.rpm
+sudo rpm -i jdk-7u65-linux-x64.rpm
+sudo alternatives --install /usr/bin/java java /usr/java/default/bin/java 20000
+yes | cp  /opt/US_export_policy.jar /usr/java/default/jre/lib/security/US_export_policy.jar
+yes | cp  /opt/local_policy.jar /usr/java/default/jre/lib/security/local_policy.jar
+java -version
+rm -fr /opt/*.jar
+rm -fr /opt/*.rpm
+
 echo 'Installing nginx...'
 yum -y install nginx
 
