@@ -1,19 +1,17 @@
 #!/bin/sh
 
-# You must run this as root for it to work
-# This has been tested on a T1 Micro Instance using AMI ID : amzn-ami-pv-2014.03.1.x86_64-ebs (ami-fb8e9292)
-
-# T1 Micro Instance ID: i-ee9f1bbe
+# JDK v8
+# Play 2.3.3
 
 echo 'Updating packages ...'
 sudo yum -y update
 
-echo 'Installing Oracle Java v7 ...'
+echo 'Installing Oracle Java v8 ...'
 cd /opt/
 wget http://playframework-assets.s3.amazonaws.com/US_export_policy.jar
 wget http://playframework-assets.s3.amazonaws.com/local_policy.jar
-wget http://playframework-assets.s3.amazonaws.com/jdk-7u65-linux-x64.rpm
-sudo rpm -i jdk-7u65-linux-x64.rpm
+wget http://playframework-assets.s3.amazonaws.com/jdk-8u20-linux-x64.rpm
+sudo rpm -i jdk-8u20-linux-x64.rpm
 sudo alternatives --install /usr/bin/java java /usr/java/default/bin/java 20000
 yes | cp  /opt/US_export_policy.jar /usr/java/default/jre/lib/security/US_export_policy.jar
 yes | cp  /opt/local_policy.jar /usr/java/default/jre/lib/security/local_policy.jar
@@ -85,14 +83,15 @@ mkdir /var/app
 
 echo 'Downloading Playframework ...'
 cd /opt/
-wget -P /opt/ http://playframework-assets.s3.amazonaws.com/play-2.2.3.zip
-unzip /opt/play-2.2.3.zip
-rm -f /opt/play-2.2.3.zip
+wget -P /opt/ http://downloads.typesafe.com/typesafe-activator/1.2.10/typesafe-activator-1.2.10-minimal.zip
+unzip /opt/typesafe-activator-1.2.10-minimal.zip
+rm -f /opt/typesafe-activator-1.2.10-minimal.zip
+chmod a+x /opt/activator-1.2.10-minimal/activator
 
 echo 'Adding Play to the PATH ...'
-export PATH=$PATH:/opt/play-2.2.3
+export PATH=$PATH:/opt/activator-1.2.10-minimal/
 echo '#! /bin/sh
-export PATH=$PATH:/opt/play-2.2.3
+export PATH=$PATH:/opt/activator-1.2.10-minimal/
 ' > /etc/profile.d/play.sh
 chmod +x /etc/profile.d/play.sh
 
@@ -138,12 +137,14 @@ start() {
     CONFIG_FILE="rc.application.conf"
   fi
 
-  if [ -f $APP_PATH/*/conf/live.application.conf ]; then
-    CONFIG_FILE="live.application.conf"
-  fi
+#  if [ -f $APP_PATH/*/conf/live.application.conf ]; then
+#    CONFIG_FILE="live.application.conf"
+#  fi
 
 	BIN=`find $APP_PATH/*/bin -not -name "*.bat" -not -type d`
   $BIN -J-Xms64M -J-Xmx256m -Dpidfile.path=/var/run/play.pid -Dconfig.file=/var/app/current/conf/$CONFIG_FILE >/dev/null 2>&1 &
+#  $BIN -J-Xms256M -J-Xmx2048m -Dpidfile.path=/var/run/play.pid -Dconfig.file=/var/app/current/conf/$CONFIG_FILE>/dev/null 2>&1 &
+
   /usr/bin/monit monitor play
   return 0
 }
