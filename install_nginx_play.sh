@@ -19,6 +19,11 @@ java -version
 rm -fr /opt/*.jar
 rm -fr /opt/*.rpm
 
+echo 'Creating nginx cache directory'
+mkdir /data
+mkdir /data/nginx
+mkdir /data/nginx/cache
+
 echo 'Installing nginx...'
 yum -y install nginx
 
@@ -41,7 +46,10 @@ proxy_buffer_size         16k;
 proxy_buffers             32              16k;
 proxy_busy_buffers_size   64k;' > /etc/nginx/conf.d/proxy.conf
 
-echo 'server {
+echo '
+proxy_cache_path /data/nginx/cache keys_zone=assets:10m max_size=2000m;
+
+server {
  listen 80;
  server_name _;
  access_log /var/log/httpd/elasticbeanstalk-access_log;
@@ -49,6 +57,8 @@ echo 'server {
 
  #set the default location
  location /assets/ {
+  proxy_cache assets;
+  proxy_cache_valid 200 180m;
   expires max;
   add_header Cache-Control public;
   proxy_pass         http://127.0.0.1:9000/assets/;
