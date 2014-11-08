@@ -4,13 +4,6 @@
 # Play 2.3.3
 # run as root
 
-echo 'Updating packages ...'
-sudo yum -y update
-
-echo 'Installing git ...'
-sudo yum -y install git
-git clone git@github.com:davemaple/playframework-nginx-elastic-beanstalk.git /home/ec2-user/playframework-nginx-elastic-beanstalk
-
 echo 'Creating nginx cache directory'
 mkdir /data
 mkdir /data/nginx
@@ -218,24 +211,23 @@ echo 'Removing tomcat...'
 yum -y remove tomcat7
 
 echo 'Downloading sample test app for play'
-cd /var/app
-wget -P /var/app/ http://playframework-assets.s3.amazonaws.com/playapp.zip
-cp /var/app/playapp.zip /opt/elasticbeanstalk/deploy/appsource/source_bundle
+cd /home/ec2-user/
+git clone https://github.com/davemaple/playframework-example-application-mode.git
+cd /home/ec2-user/playframework-example-application-mode
+activator dist
+cp /home/ec2-user/playframework-example-application-mode/target/universal/playtest.zip /opt/elasticbeanstalk/deploy/appsource/source_bundle
 
 echo 'Starting up play'
 sudo service play start
 
 echo 'Configuring Elastic Beanstalk for Playframework deployment ... '
 cd /home/ec2-user
-wget -P /home/ec2-user http://playframework-assets.s3.amazonaws.com/elasticbeanstalk.zip
-unzip /home/ec2-user/elasticbeanstalk.zip
-rm /home/ec2-user/elasticbeanstalk.zip
 rm -fR /opt/elasticbeanstalk/hooks
-cp -a /home/ec2-user/elasticbeanstalk/hooks /opt/elasticbeanstalk/
+cp -a /home/ec2-user/playframework-nginx-elastic-beanstalk/elasticbeanstalk/hooks /opt/elasticbeanstalk/
 rm -fR /opt/elasticbeanstalk/tasks
-cp -a /home/ec2-user/elasticbeanstalk/tasks /opt/elasticbeanstalk/
+cp -a /home/ec2-user/playframework-nginx-elastic-beanstalk/elasticbeanstalk/tasks /opt/elasticbeanstalk/
 rm -fR /opt/elasticbeanstalk/containerfiles
-cp -a /home/ec2-user/elasticbeanstalk/containerfiles /opt/elasticbeanstalk/
+cp -a /home/ec2-user/playframework-nginx-elastic-beanstalk/elasticbeanstalk/containerfiles /opt/elasticbeanstalk/
 
 echo 'Reconfiguring monit ... '
 cp -f /opt/elasticbeanstalk/containerfiles/monit.conf /etc/monit.d/monit.conf
@@ -244,5 +236,8 @@ sudo service monit restart
 
 echo 'Cleaning up ... '
 yum -y remove git
+cd /root
+rm -fR /home/ec2-user/*
+
 
 
