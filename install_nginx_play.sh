@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # JDK v8
-# Play 2.3.3
+# Play 2.3.X
 # run as root
 
 echo 'Creating nginx cache directory'
@@ -212,10 +212,8 @@ yum -y remove tomcat7
 
 echo 'Downloading sample test app for play'
 cd /home/ec2-user/
-git clone https://github.com/davemaple/playframework-example-application-mode.git
-cd /home/ec2-user/playframework-example-application-mode
-activator dist
-cp /home/ec2-user/playframework-example-application-mode/target/universal/playtest-1.0-SNAPSHOT.zip /opt/elasticbeanstalk/deploy/appsource/source_bundle
+wget --output-document playtest.zip https://github.com/davemaple/playframework-example-application-mode/blob/master/playtest.zip?raw=true
+cp playtest.zip /opt/elasticbeanstalk/deploy/appsource/source_bundle
 
 echo 'Starting up play'
 sudo service play start
