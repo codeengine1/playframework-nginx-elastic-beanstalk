@@ -6,18 +6,8 @@
 echo 'Updating packages ...'
 sudo yum -y update
 
-echo 'Installing Oracle Java v8 ...'
-cd /opt/
-wget http://playframework-assets.s3.amazonaws.com/US_export_policy.jar
-wget http://playframework-assets.s3.amazonaws.com/local_policy.jar
-wget http://playframework-assets.s3.amazonaws.com/jdk-8u20-linux-x64.rpm
-sudo rpm -i jdk-8u20-linux-x64.rpm
-sudo alternatives --install /usr/bin/java java /usr/java/default/bin/java 20000
-yes | cp  /opt/US_export_policy.jar /usr/java/default/jre/lib/security/US_export_policy.jar
-yes | cp  /opt/local_policy.jar /usr/java/default/jre/lib/security/local_policy.jar
-java -version
-rm -fr /opt/*.jar
-rm -fr /opt/*.rpm
+echo 'Installing git ...'
+sudo yum -y install git
 
 echo 'Creating nginx cache directory'
 mkdir /data
@@ -32,7 +22,7 @@ sed -i 's/worker_processes  1;/worker_processes  2;/g' /etc/nginx/nginx.conf
 rm -f /etc/nginx/conf.d/virtual.conf
 
 echo 'Creating configuration files'
-echo 'proxy_redirect            off;
+echo 'proxy_redirect      off;
 proxy_set_header          Host            $host;
 proxy_set_header          X-Real-IP       $remote_addr;
 proxy_set_header          X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -49,10 +39,16 @@ proxy_busy_buffers_size   64k;' > /etc/nginx/conf.d/proxy.conf
 echo '
 proxy_cache_path /data/nginx/cache keys_zone=assets:10m max_size=2000m;
 
+log_format playframework ''$remote_addr\t"$cookie_visitorId"\t$time_iso8601\t"$request"\t$status\t$body_bytes_sent\t"$http_referer"\t"$http_user_agent"\t$body_bytes_sent\t$msec\t$request_time'';
+
+real_ip_header X-Forwarded-For;
+set_real_ip_from 10.0.0.0/8;
+real_ip_recursive on;
+
 server {
  listen 80;
  server_name _;
- access_log /var/log/httpd/elasticbeanstalk-access_log;
+ access_log /var/log/httpd/elasticbeanstalk-access_log playframework;
  error_log /var/log/httpd/elasticbeanstalk-error_log;
 
  #set the default location
@@ -152,8 +148,8 @@ start() {
 #  fi
 
 	BIN=`find $APP_PATH/*/bin -not -name "*.bat" -not -type d`
-  $BIN -J-Xms64M -J-Xmx256m -Dpidfile.path=/var/run/play.pid -Dconfig.file=/var/app/current/conf/$CONFIG_FILE >/dev/null 2>&1 &
-#  $BIN -J-Xms256M -J-Xmx2048m -Dpidfile.path=/var/run/play.pid -Dconfig.file=/var/app/current/conf/$CONFIG_FILE>/dev/null 2>&1 &
+  $BIN -J-Xms64M -J-Xmx256m -Dpidfile.path=/var/run/play.pid -Dconfig.file=/var/app/current/conf/$CONFIG_FILE -Dnetworkaddress.cache.ttl=60>/dev/null 2>&1 &
+#  $BIN -J-Xms256M -J-Xmx2048m -Dpidfile.path=/var/run/play.pid -Dconfig.file=/var/app/current/conf/$CONFIG_FILE -Dnetworkaddress.cache.ttl=60>/dev/null 2>&1 &
 
   /usr/bin/monit monitor play
   return 0
@@ -243,4 +239,8 @@ echo 'Reconfiguring monit ... '
 cp -f /opt/elasticbeanstalk/containerfiles/monit.conf /etc/monit.d/monit.conf
 echo 'Restarting monit service ...'
 sudo service monit restart
+
+echo 'Cleaning up ... '
+yum -y remove git
+
 
