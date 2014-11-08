@@ -215,7 +215,7 @@ cd /home/ec2-user/
 git clone https://github.com/davemaple/playframework-example-application-mode.git
 cd /home/ec2-user/playframework-example-application-mode
 activator dist
-cp /home/ec2-user/playframework-example-application-mode/target/universal/playtest.zip /opt/elasticbeanstalk/deploy/appsource/source_bundle
+cp /home/ec2-user/playframework-example-application-mode/target/universal/playtest-1.0-SNAPSHOT.zip /opt/elasticbeanstalk/deploy/appsource/source_bundle
 
 echo 'Starting up play'
 sudo service play start

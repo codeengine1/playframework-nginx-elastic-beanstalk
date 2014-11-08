@@ -5,10 +5,11 @@ First, create a tomcat application on Elastic Beanstalk. Then SSH onto the EC2 I
 
 
 <pre>
-sudo yum -y update
-sudo yum -y install git
+sudo su
+yum -y update
+yum -y install git
 cd /home/ec2-user/
-sudo git clone https://github.com/davemaple/playframework-nginx-elastic-beanstalk.git
-sudo chmod +x /home/ec2-user/playframework-nginx-elastic-beanstalk/install_nginx_play.sh
-sudo /home/ec2-user/playframework-nginx-elastic-beanstalk/install_nginx_play.sh
+git clone https://github.com/davemaple/playframework-nginx-elastic-beanstalk.git
+chmod +x /home/ec2-user/playframework-nginx-elastic-beanstalk/install_nginx_play.sh
+/home/ec2-user/playframework-nginx-elastic-beanstalk/install_nginx_play.sh
 </pre>
