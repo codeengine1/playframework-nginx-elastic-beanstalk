@@ -12,4 +12,6 @@ cd /home/ec2-user/
 git clone https://github.com/davemaple/playframework-nginx-elastic-beanstalk.git
 chmod +x /home/ec2-user/playframework-nginx-elastic-beanstalk/install_nginx_play.sh
 /home/ec2-user/playframework-nginx-elastic-beanstalk/install_nginx_play.sh
+echo 'done!'
+
 </pre>
