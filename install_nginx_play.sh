@@ -2,12 +2,14 @@
 
 # JDK v8
 # Play 2.3.3
+# run as root
 
 echo 'Updating packages ...'
 sudo yum -y update
 
 echo 'Installing git ...'
 sudo yum -y install git
+git clone git@github.com:davemaple/playframework-nginx-elastic-beanstalk.git /home/ec2-user/playframework-nginx-elastic-beanstalk
 
 echo 'Creating nginx cache directory'
 mkdir /data
