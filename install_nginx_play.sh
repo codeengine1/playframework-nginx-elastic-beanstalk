@@ -73,6 +73,7 @@ echo 'Making sure that nginx starts on startup'
 
 echo 'Removing apache...'
 yum -y remove httpd
+rm -f /etc/monit.d/monit-apache.conf
 
 echo 'Starting nginx'
 sudo service nginx start
