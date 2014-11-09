@@ -1,0 +1,102 @@
+#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides:          play
+# Required-Start:    $all
+# Required-Stop:     $all
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description:
+# Description:
+### END INIT INFO
+
+. /etc/rc.d/init.d/functions
+
+APP="playapp"
+APP_PATH="/var/app/$APP"
+
+start() {
+
+  cp /opt/elasticbeanstalk/deploy/appsource/source_bundle /var/app/playapp.zip
+  rm -fR $APP_PATH/*
+  unzip "$APP_PATH.zip" -d $APP_PATH
+  rm "$APP_PATH.zip"
+  unlink /var/app/current
+  ln -s $APP_PATH/*/ /var/app/current
+
+  CONFIG_FILE="application.conf"
+  MODE=`cat /opt/elasticbeanstalk/deploy/configuration/containerconfiguration | jq --raw-output '.optionsettings."aws:elasticbeanstalk:application:environment" | .[] | if startswith("mode=") then . else "" end ' | xargs echo $1`
+
+  if [ "$(MODE)" == "mode=rc"]; then
+    if [ -f $APP_PATH/*/conf/rc.application.conf ]; then
+      CONFIG_FILE="rc.application.conf"
+    fi
+  fi
+
+  if [ "$(MODE)" == "mode=live"]; then
+    if [ -f $APP_PATH/*/conf/live.application.conf ]; then
+      CONFIG_FILE="live.application.conf"
+    fi
+  fi
+
+	BIN=`find $APP_PATH/*/bin -not -name "*.bat" -not -type d`
+  XMS=`cat /opt/elasticbeanstalk/deploy/configuration/containerconfiguration | jq --raw-output '.optionsettings."aws:elasticbeanstalk:container:tomcat:jvmoptions" | .[] | if startswith("Xms=") then "-J" + . else "" end ' | xargs echo $1`
+  XMX=`cat /opt/elasticbeanstalk/deploy/configuration/containerconfiguration | jq --raw-output '.optionsettings."aws:elasticbeanstalk:container:tomcat:jvmoptions" | .[] | if startswith("Xmx=") then "-J" + . else "" end ' | xargs echo $1`
+  $BIN $XMS $XMX -Dpidfile.path=/var/run/play.pid -Dconfig.file=/var/app/current/conf/$CONFIG_FILE -Dnetworkaddress.cache.ttl=60>/dev/null 2>&1 &
+
+  /usr/bin/monit monitor play
+  return 0
+}
+
+stop() {
+  PLAY_PROCESS=""
+
+  if [ -f /var/run/play.pid ]; then
+    PLAY_PROCESS=$(cat /var/run/play.pid)
+  else 
+    PLAY_PROCESS=$(ps aux | grep '[p]lay' | awk '{print $2}')
+  fi
+
+  if [ "$PLAY_PROCESS" != "" ]; then
+    kill $PLAY_PROCESS
+  fi
+
+  return 0
+}
+
+
+status() {
+  if [ -f /var/run/play.pid ]; then
+    exit 0;
+  else 
+    exit 1;
+  fi
+}
+
+case "$1" in
+  start)
+    start
+    exit 0
+    ;;
+  stop)
+    stop
+    ;;
+  restart)
+    echo  "Restarting $APP."
+    stop
+    sleep 2
+    start
+    echo "$APP restarted."
+    ;;
+  status)
+    echo  "Checking status"
+    status
+    ;;
+  *)
+    N=/etc/init.d/play.$APP
+    echo "Usage: $N {start|stop|restart}" >&2
+    exit 1
+    ;;
+esac
+
+exit 0
