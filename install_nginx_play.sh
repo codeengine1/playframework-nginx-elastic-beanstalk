@@ -126,8 +126,8 @@ yum -y remove tomcat7
 
 echo 'Downloading sample test app for play'
 cd /home/ec2-user/
-wget --output-document playtest.zip https://github.com/davemaple/playframework-example-application-mode/blob/master/playtest.zip?raw=true
-cp playtest.zip /opt/elasticbeanstalk/deploy/appsource/source_bundle
+wget --output-document /var/app/playapp.zip https://github.com/davemaple/playframework-example-application-mode/blob/master/playtest.zip?raw=true
+cp /var/app/playapp.zip /opt/elasticbeanstalk/deploy/appsource/source_bundle
 
 echo 'Starting up play'
 sudo service play start
