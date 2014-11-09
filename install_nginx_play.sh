@@ -4,6 +4,15 @@
 # Play 2.3.X
 # run as root
 
+yum -y update
+yum -y install git
+cd /home/ec2-user/
+
+# # could read environment variables and pass them to play here
+# wget --output-document /usr/bin/jq http://stedolan.github.io/jq/download/linux64/jq
+# chmod +x /usr/bin/jq
+# cat /opt/elasticbeanstalk/deploy/configuration/containerconfiguration | jq '.["optionsettings"]["aws:elasticbeanstalk:application:environment"][]' | echo $1;
+
 echo 'Creating nginx cache directory'
 mkdir /data
 mkdir /data/nginx
@@ -235,6 +244,7 @@ sudo service monit restart
 
 echo 'Cleaning up ... '
 yum -y remove git
+yum -y remove gcc
 cd /root
 rm -fR /home/ec2-user/*
 
