@@ -122,7 +122,7 @@ echo 'Making sure that play starts on startup'
 /sbin/chkconfig play on
 
 echo 'Removing tomcat...'
-yum -y remove tomcat7
+yum -y remove tomcat8
 
 echo 'Downloading sample test app for play'
 cd /home/ec2-user/

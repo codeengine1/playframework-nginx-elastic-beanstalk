@@ -21,28 +21,33 @@ start() {
   rm -fR $APP_PATH/*
   unzip "$APP_PATH.zip" -d $APP_PATH
   rm "$APP_PATH.zip"
-  unlink /var/app/current
+
+  if [ -f /var/app/current ]; then
+    unlink /var/app/current
+  fi
+
   ln -s $APP_PATH/*/ /var/app/current
 
   CONFIG_FILE="application.conf"
-  MODE=`cat /opt/elasticbeanstalk/deploy/configuration/containerconfiguration | jq --raw-output '.optionsettings."aws:elasticbeanstalk:application:environment" | .[] | if startswith("mode=") then . else "" end ' | xargs echo $1`
+  MODE=$( cat /opt/elasticbeanstalk/deploy/configuration/containerconfiguration | jq --raw-output '.optionsettings."aws:elasticbeanstalk:application:environment" | .[] | if startswith("mode=") then . else "" end ' | xargs echo $1 )
 
-  if [ "$MODE" == "mode=rc"]; then
+  if [ "$MODE" == "mode=rc" ]; then
     if [ -f $APP_PATH/*/conf/rc.application.conf ]; then
       CONFIG_FILE="rc.application.conf"
     fi
   fi
 
-  if [ "$MODE" == "mode=live"]; then
+  if [ "$MODE" == "mode=live" ]; then
     if [ -f $APP_PATH/*/conf/live.application.conf ]; then
       CONFIG_FILE="live.application.conf"
     fi
   fi
 
-	BIN=`find $APP_PATH/*/bin -not -name "*.bat" -not -type d`
-  XMS=`cat /opt/elasticbeanstalk/deploy/configuration/containerconfiguration | jq --raw-output '.optionsettings."aws:elasticbeanstalk:container:tomcat:jvmoptions" | .[] | if startswith("Xms=") then "-J" + . else "" end ' | xargs echo $1`
-  XMX=`cat /opt/elasticbeanstalk/deploy/configuration/containerconfiguration | jq --raw-output '.optionsettings."aws:elasticbeanstalk:container:tomcat:jvmoptions" | .[] | if startswith("Xmx=") then "-J" + . else "" end ' | xargs echo $1`
-  $BIN $XMS $XMX -Dpidfile.path=/var/run/play.pid -Dconfig.file=/var/app/current/conf/$CONFIG_FILE -Dnetworkaddress.cache.ttl=60>/dev/null 2>&1 &
+	PLAY_BIN=`find $APP_PATH/*/bin -not -name "*.bat" -not -type d`
+  PLAY_XMS="$( cat /opt/elasticbeanstalk/deploy/configuration/containerconfiguration | jq --raw-output '.optionsettings."aws:elasticbeanstalk:container:tomcat:jvmoptions" | .[] | if startswith("Xms=") then . else "" end ' | xargs echo $1 | tr -d 'Xms=' | tr -d '\n' )m"
+  PLAY_XMX="$( cat /opt/elasticbeanstalk/deploy/configuration/containerconfiguration | jq --raw-output '.optionsettings."aws:elasticbeanstalk:container:tomcat:jvmoptions" | .[] | if startswith("Xmx=") then . else "" end ' | xargs echo $1 | tr -d 'Xmx=' | tr -d '\n' )m"
+  PLAY_COMMAND="$PLAY_BIN -J-Xms$PLAY_XMS -J-Xmx$PLAY_XMX -Dpidfile.path=/var/run/play.pid -Dconfig.file=/var/app/current/conf/$CONFIG_FILE -Dnetworkaddress.cache.ttl=60"
+  $PLAY_COMMAND>/dev/null 2>&1 &
 
   /usr/bin/monit monitor play
   return 0
