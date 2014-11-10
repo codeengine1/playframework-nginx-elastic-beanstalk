@@ -123,6 +123,7 @@ echo 'Making sure that play starts on startup'
 
 echo 'Removing tomcat...'
 yum -y remove tomcat8
+rm -f /etc/monit.d/monit-tomcat8.conf
 
 echo 'Downloading sample test app for play'
 cd /home/ec2-user/
@@ -148,7 +149,6 @@ sudo service monit restart
 
 echo 'Cleaning up ... '
 yum -y remove git
-yum -y remove gcc
 cd /root
 rm -fR /home/ec2-user/*
 

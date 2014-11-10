@@ -15,3 +15,7 @@ chmod +x /home/ec2-user/playframework-nginx-elastic-beanstalk/install_nginx_play
 echo 'done!'
 
 </pre>
+
+<p>
+Latest Public AMI: <strong>ami-6ca62d04</strong>
+</p>
