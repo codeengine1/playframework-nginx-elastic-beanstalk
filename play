@@ -22,7 +22,7 @@ start() {
   unzip "$APP_PATH.zip" -d $APP_PATH
   rm "$APP_PATH.zip"
 
-  if [ -f /var/app/current ]; then
+  if [ -L /var/app/current ]; then
     unlink /var/app/current
   fi
 
