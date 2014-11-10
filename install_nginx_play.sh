@@ -4,11 +4,14 @@
 # Play 2.3.X
 # run as root
 
+# update dns cache TTL to 60 seconds
+echo -e "\n\nnetworkaddress.cache.ttl = 0\nnetworkaddress.cache.negative.ttl = 0\n\n" >> /usr/lib/jvm/jre/lib/security/java.security
+
 yum -y update
 yum -y install git
 cd /home/ec2-user/
 
-# # could read environment variables and pass them to play here
+# add jq to parse JSON
 wget --output-document /usr/bin/jq http://stedolan.github.io/jq/download/linux64/jq
 chmod +x /usr/bin/jq
 
