@@ -22,3 +22,5 @@ then
 fi
 
 /etc/init.d/play start
+
+/etc/init.d/nginx restart

@@ -17,5 +17,5 @@ echo 'done!'
 </pre>
 
 <p>
-Latest Public AMI: <strong>ami-2af88042</strong>
+Latest Public AMI: <strong>ami-b0f78fd8</strong> January 22, 2015  
 </p>
