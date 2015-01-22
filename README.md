@@ -16,6 +16,10 @@ echo 'done!'
 
 </pre>
 
-<p>
-Latest Public AMI: <strong>ami-b0f78fd8</strong> January 22, 2015  
-</p>
+<table>
+	<tr>
+		<td>Latest Public AMI:</td>
+		<td><strong>ami-b0f78fd8</strong></td>
+		<td>January 22, 2015</td>
+	</tr>
+</table>
