@@ -86,8 +86,8 @@ echo 'Removing apache...'
 yum -y remove httpd
 rm -f /etc/monit.d/monit-apache.conf
 
-echo 'Starting nginx'
-sudo service nginx start
+echo 'Restarting nginx'
+sudo service nginx restart
 
 echo 'Nginx is installed'
 
