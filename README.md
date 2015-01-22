@@ -1,14 +1,11 @@
 <h3 style="margin-bottom: 0.5em;">Nginx + Playframework on AWS Elastic Beanstalk</h3>
 
-<table>
+<table style="border: 0;">
 	<tr>
 		<td><img src="http://cdn2.hubspot.net/hub/362403/file-1158785862-png/elastic_beanstalk.png" width="75" /></td>
 		<td style="padding-left: 45px;"><img src="https://www.playframework.com/assets/images/logos/play_full_color.svg" width="100" /></td>
 		<td style="padding-left: 35px;"><img src="http://nginx.org/nginx.png" width="100" /></td>
 	</tr>
-</table>
-
-<table>
 	<tr>
 		<td>Latest Public AMI:</td>
 		<td><strong>ami-b0f78fd8</strong></td>
