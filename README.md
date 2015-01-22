@@ -1,6 +1,6 @@
 <h3 style="margin-bottom: 0.5em;">Nginx + Playframework on AWS Elastic Beanstalk</h3>
 
-<table style="border: 0;">
+<table border="0">
 	<tr>
 		<td><img src="http://cdn2.hubspot.net/hub/362403/file-1158785862-png/elastic_beanstalk.png" width="75" /></td>
 		<td style="padding-left: 45px;"><img src="https://www.playframework.com/assets/images/logos/play_full_color.svg" width="100" /></td>
