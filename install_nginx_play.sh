@@ -67,11 +67,11 @@ server {
  }
 
  #websocket support
- location /websocket/ {                                                                               │pi/index-all.html...
-  proxy_pass http://127.0.0.1:9000/websocket/;                                                        │[info] Generating /Users/dmaple/Documents/code/adom-framework/adom-framework-core/target/scala-2.11/a
-  proxy_http_version 1.1;                                                                             │pi/deprecated-list.html...
-  proxy_set_header Upgrade $http_upgrade;                                                             │[info] Building index for all classes...
-  proxy_set_header Connection "upgrade";                                                              │[info] Generating /Users/dmaple/Documents/code/adom-framework/adom-framework-core/target/scala-2.11/a
+ location /websocket/ {
+  proxy_pass http://127.0.0.1:9000/websocket/;
+  proxy_http_version 1.1;
+  proxy_set_header Upgrade $http_upgrade;
+  proxy_set_header Connection "upgrade"; 
  }
 
  location / {
