@@ -1,0 +1,146 @@
+#!/bin/sh
+
+# run as root
+
+# add unstable repos
+echo -e "\n\n#### unstable #########\ndeb http://ftp.us.debian.org/debian unstable main contrib non-free\n\n" >> /etc/apt/sources.list
+apt-get update
+
+# install monit
+sudo apt-get install monit
+
+# install java
+apt-get -y --no-install-recommends --force-yes -t unstable install openjdk-8-jdk
+
+# update dns cache TTL to 60 seconds
+echo -e "\n\nnetworkaddress.cache.ttl = 0\nnetworkaddress.cache.negative.ttl = 0\n\n" >> /usr/lib/jvm/java-1.8*openjdk*/jre/lib/security/java.security
+
+# add jq to parse JSON
+wget --output-document /usr/bin/jq http://stedolan.github.io/jq/download/linux64/jq
+chmod +x /usr/bin/jq
+
+echo 'Creating nginx cache directory'
+mkdir /data
+mkdir /data/nginx
+mkdir /data/nginx/cache
+
+echo 'Installing nginx...'
+apt-get -y --no-install-recommends --force-yes install nginx
+
+echo 'Fixing nginx configuration'
+sed -i 's/worker_processes 4;/worker_processes 1;/g' /etc/nginx/nginx.conf
+
+echo 'Creating configuration files'
+echo 'proxy_redirect      off;
+proxy_set_header          Host            $host;
+proxy_set_header          X-Real-IP       $remote_addr;
+proxy_set_header          X-Forwarded-For $proxy_add_x_forwarded_for;
+client_max_body_size      10m;
+client_body_buffer_size   128k;
+client_header_buffer_size 64k;
+proxy_connect_timeout     90;
+proxy_send_timeout        90;
+proxy_read_timeout        90;
+proxy_buffer_size         16k;
+proxy_buffers             32              16k;
+proxy_busy_buffers_size   64k;' > /etc/nginx/conf.d/proxy.conf
+
+echo '
+proxy_cache_path /data/nginx/cache keys_zone=assets:10m max_size=2000m;
+
+log_format playframework ''$remote_addr\t"$cookie_visitorId"\t$time_iso8601\t"$request"\t$status\t$body_bytes_sent\t"$http_referer"\t"$http_user_agent"\t$body_bytes_sent\t$msec\t$request_time'';
+
+real_ip_header X-Forwarded-For;
+set_real_ip_from 10.0.0.0/8;
+real_ip_recursive on;
+
+server {
+ listen 80;
+ server_name _;
+ access_log /var/log/nginx/playframework-access playframework;
+ error_log /var/log/nginx/playframework-error;
+
+ #set the default location
+ location /assets/ {
+  proxy_cache assets;
+  proxy_cache_valid 200 180m;
+  expires max;
+  add_header Cache-Control public;
+  proxy_pass         http://127.0.0.1:9000/assets/;
+ }
+
+ #websocket support
+ location /websocket/ {
+  proxy_pass http://127.0.0.1:9000/websocket/;
+  proxy_http_version 1.1;
+  proxy_set_header Upgrade $http_upgrade;
+  proxy_set_header Connection "upgrade"; 
+ }
+
+ location / {
+  add_header Cache-Control "no-store, must-revalidate";
+  add_header Pragma no-cache;
+  expires epoch;
+  proxy_pass         http://127.0.0.1:9000/;
+ }
+
+}' > /etc/nginx/conf.d/playframework.conf
+
+echo 'Making sure that nginx starts on startup'
+update-rc.d nginx defaults
+
+echo 'Restarting nginx'
+sudo service nginx restart
+
+echo 'Nginx is installed'
+
+echo 'Creating app directory'
+mkdir /var/app
+
+echo 'Downloading Playframework ...'
+cd /opt/
+wget -P /opt/ -O /opt/activator.zip http://downloads.typesafe.com/typesafe-activator/1.2.12/typesafe-activator-1.2.12.zip
+unzip /opt/activator.zip
+rm -f /opt/activator.zip
+chmod a+x /opt/activator-1.2.12/activator
+
+echo 'Adding Play to the PATH ...'
+export PATH=$PATH:/opt/activator-1.2.12/
+echo '#! /bin/sh
+export PATH=$PATH:/opt/activator-1.2.12/
+' > /etc/profile.d/play.sh
+chmod +x /etc/profile.d/play.sh
+source /etc/profile.d/play.sh
+
+echo 'Adding play startup script'
+wget -O /etc/init.d/play https://raw.githubusercontent.com/davemaple/playframework-nginx-elastic-beanstalk/master/play
+chmod +x /etc/init.d/play
+sed -i '/rc.d/d' /etc/init.d/play
+
+echo 'Making sure that play starts on startup'
+update-rc.d play defaults
+
+echo 'Creating source deployment directory ...'
+mkdir /opt/elasticbeanstalk
+mkdir /opt/elasticbeanstalk/deploy
+mkdir /opt/elasticbeanstalk/deploy/appsource
+mkdir /opt/elasticbeanstalk/deploy/configuration
+
+echo 'Downloading sample test app for play'
+wget -O /opt/elasticbeanstalk/deploy/appsource/source_bundle https://github.com/davemaple/playframework-example-application-mode/blob/master/playtest.zip?raw=true
+
+echo 'Starting up play'
+sudo service play start
+
+echo 'Reconfiguring monit ... '
+cp -f /opt/elasticbeanstalk/containerfiles/monit.conf /etc/monit.d/monit.conf
+echo 'Restarting monit service ...'
+sudo service monit restart
+
+echo 'Cleaning up ... '
+yum -y remove git
+cd /root
+rm -fR /home/ec2-user/*
+
+
+

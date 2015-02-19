@@ -1,0 +1,6 @@
+{
+	"optionsettings": {
+		"aws:elasticbeanstalk:container:tomcat:jvmoptions": ["XX:MaxPermSize=64m", "JVM Options=", "Xmx=768m", "Xms=768m"],
+		"aws:elasticbeanstalk:application:environment": ["AWS_SECRET_KEY=", "mode=rc", "AWS_ACCESS_KEY_ID="]
+	}
+}
