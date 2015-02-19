@@ -5,7 +5,9 @@
 # run as root
 
 # update dns cache TTL to 60 seconds
-echo -e "\n\nnetworkaddress.cache.ttl = 0\nnetworkaddress.cache.negative.ttl = 0\n\n" >> /usr/lib/jvm/jre/lib/security/java.security
+echo '
+networkaddress.cache.ttl = 0\nnetworkaddress.cache.negative.ttl = 0
+' >> /usr/lib/jvm/jre/lib/security/java.security
 
 yum -y update
 yum -y install git

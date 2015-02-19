@@ -13,7 +13,11 @@ sudo apt-get install memcached
 update-rc.d memcached defaults
 
 # add unstable repos
-echo -e "\n\n#### unstable #########\ndeb http://ftp.us.debian.org/debian unstable main contrib non-free\n\n" >> /etc/apt/sources.list
+echo '
+
+#### unstable #########\ndeb http://ftp.us.debian.org/debian unstable main contrib non-free
+
+' >> /etc/apt/sources.list
 apt-get update
 
 # install monit
@@ -23,7 +27,9 @@ sudo apt-get install monit
 apt-get -y --no-install-recommends --force-yes -t unstable install openjdk-8-jdk
 
 # update dns cache TTL to 60 seconds
-echo -e "\n\nnetworkaddress.cache.ttl = 0\nnetworkaddress.cache.negative.ttl = 0\n\n" >> /usr/lib/jvm/java-1.8*openjdk*/jre/lib/security/java.security
+echo '
+nnetworkaddress.cache.ttl = 0\nnetworkaddress.cache.negative.ttl = 0
+' >> /usr/lib/jvm/java-1.8*openjdk*/jre/lib/security/java.security
 
 # add jq to parse JSON
 wget --output-document /usr/bin/jq http://stedolan.github.io/jq/download/linux64/jq
