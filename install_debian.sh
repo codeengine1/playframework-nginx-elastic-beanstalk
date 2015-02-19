@@ -31,6 +31,7 @@ apt-get -y --no-install-recommends --force-yes install nginx
 echo 'Fixing nginx configuration'
 sed -i 's/worker_processes 4;/worker_processes 1;/g' /etc/nginx/nginx.conf
 sed -i 's/worker_connections 768;/worker_connections 1024;/g' /etc/nginx/nginx.conf
+sed -i '/sites-enabled/d' /etc/nginx/nginx.conf
 
 echo 'Creating configuration files'
 echo 'proxy_redirect      off;
@@ -57,68 +58,80 @@ set_real_ip_from 10.0.0.0/8;
 real_ip_recursive on;
 
 server {
- listen 80;
- server_name _;
- access_log /var/log/nginx/playframework-access playframework;
- error_log /var/log/nginx/playframework-error;
+    listen 80;
+    server_name _;
+    access_log /var/log/nginx/play.access.log playframework;
+    error_log /var/log/nginx/play.error.log;
 
- #set the default location
- location /assets/ {
-  proxy_cache assets;
-  proxy_cache_valid 200 180m;
-  expires max;
-  add_header Cache-Control public;
-  proxy_pass         http://127.0.0.1:9000/assets/;
- }
+    #set the default location
+    location /assets/ {
+        proxy_cache assets;
+        proxy_cache_valid 200 180m;
+        expires max;
+        add_header Cache-Control public;
+        proxy_pass         http://127.0.0.1:9000/assets/;
+    }
 
- #websocket support
- location /websocket/ {
-  proxy_pass http://127.0.0.1:9000/websocket/;
-  proxy_http_version 1.1;
-  proxy_set_header Upgrade $http_upgrade;
-  proxy_set_header Connection "upgrade"; 
- }
+    #websocket support
+    location /websocket/ {
+        proxy_pass http://127.0.0.1:9000/websocket/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade"; 
+    }
 
- location / {
-  add_header Cache-Control "no-store, must-revalidate";
-  add_header Pragma no-cache;
-  expires epoch;
-  proxy_pass         http://127.0.0.1:9000/;
- }
+    location / {
+        add_header Cache-Control "no-store, must-revalidate";
+        add_header Pragma no-cache;
+        expires epoch;
+        proxy_pass         http://127.0.0.1:9000/;
+    }
+}
 
- server {
- listen 443;
- server_name _;
- access_log /var/log/nginx/secure.playframework-access playframework;
- error_log /var/log/nginx/secure.playframework-error;
- ssl_certificate     /opt/elasticbeanstalk/deploy/ssl/ssl.crt;
- ssl_certificate_key /opt/elasticbeanstalk/deploy/ssl/ssl.key;
+server {
+    listen 443;
+    server_name _;
+    access_log /var/log/nginx/ssl.play.access.log playframework;
+    error_log /var/log/nginx/ssl.play.error.log;
+    ssl on;
+    ssl_certificate     /opt/elasticbeanstalk/deploy/ssl/ssl.crt;
+    ssl_certificate_key /opt/elasticbeanstalk/deploy/ssl/ssl.key;
 
- #set the default location
- location /assets/ {
-  proxy_cache assets;
-  proxy_cache_valid 200 180m;
-  expires max;
-  add_header Cache-Control public;
-  proxy_pass         http://127.0.0.1:9000/assets/;
- }
+    #set the default location
+    location /assets/ {
+        proxy_cache assets;
+        proxy_cache_valid 200 180m;
+        expires max;
+        add_header Cache-Control public;
+        proxy_pass         http://127.0.0.1:9000/assets/;
+    }
 
- #websocket support
- location /websocket/ {
-  proxy_pass http://127.0.0.1:9000/websocket/;
-  proxy_http_version 1.1;
-  proxy_set_header Upgrade $http_upgrade;
-  proxy_set_header Connection "upgrade"; 
- }
+    #websocket support
+    location /websocket/ {
+        proxy_pass http://127.0.0.1:9000/websocket/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade"; 
+    }
 
- location / {
-  add_header Cache-Control "no-store, must-revalidate";
-  add_header Pragma no-cache;
-  expires epoch;
-  proxy_pass         http://127.0.0.1:9000/;
- }
+    location / {
+         add_header Cache-Control "no-store, must-revalidate";
+         add_header Pragma no-cache;
+         expires epoch;
+         proxy_pass         http://127.0.0.1:9000/;
+    }
+}
+' > /etc/nginx/conf.d/playframework.conf
 
-}' > /etc/nginx/conf.d/playframework.conf
+echo 'Creating source deployment directory ...'
+mkdir /opt/elasticbeanstalk
+mkdir /opt/elasticbeanstalk/deploy
+mkdir /opt/elasticbeanstalk/deploy/appsource
+mkdir /opt/elasticbeanstalk/deploy/configuration
+mkdir /opt/elasticbeanstalk/deploy/ssl
+
+wget -O /opt/elasticbeanstalk/deploy/ssl/ssl.key https://raw.githubusercontent.com/davemaple/playframework-nginx-elastic-beanstalk/master/ssl/ssl.key
+wget -O /opt/elasticbeanstalk/deploy/ssl/ssl.crt https://raw.githubusercontent.com/davemaple/playframework-nginx-elastic-beanstalk/master/ssl/ssl.crt
 
 echo 'Making sure that nginx starts on startup'
 update-rc.d nginx defaults
@@ -153,13 +166,6 @@ sed -i '/rc.d/d' /etc/init.d/play
 
 echo 'Making sure that play starts on startup'
 update-rc.d play defaults
-
-echo 'Creating source deployment directory ...'
-mkdir /opt/elasticbeanstalk
-mkdir /opt/elasticbeanstalk/deploy
-mkdir /opt/elasticbeanstalk/deploy/appsource
-mkdir /opt/elasticbeanstalk/deploy/configuration
-mkdir /opt/elasticbeanstalk/deploy/ssl
 
 echo 'Downloading sample test app for play'
 wget -O /opt/elasticbeanstalk/deploy/appsource/source_bundle https://github.com/davemaple/playframework-example-application-mode/blob/master/playtest.zip?raw=true
