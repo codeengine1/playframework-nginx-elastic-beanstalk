@@ -3,6 +3,15 @@
 # run as root
 # wheezy: last tested on 2015/02/18
 
+# update any available packages
+apt-get update
+apt-get -y upgrade
+
+# install memcached
+echo 'Installing memcached ...'
+sudo apt-get install memcached
+update-rc.d memcached defaults
+
 # add unstable repos
 echo -e "\n\n#### unstable #########\ndeb http://ftp.us.debian.org/debian unstable main contrib non-free\n\n" >> /etc/apt/sources.list
 apt-get update
