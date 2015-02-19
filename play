@@ -31,13 +31,13 @@ start() {
   CONFIG_FILE="application.conf"
   MODE=$( cat /opt/elasticbeanstalk/deploy/configuration/containerconfiguration | jq --raw-output '.optionsettings."aws:elasticbeanstalk:application:environment" | .[] | if startswith("mode=") then . else "" end ' | xargs echo $1 )
 
-  if [ "$MODE" == "mode=rc" ]; then
+  if [ "$MODE" = "mode=rc" ]; then
     if [ -f $APP_PATH/*/conf/rc.application.conf ]; then
       CONFIG_FILE="rc.application.conf"
     fi
   fi
 
-  if [ "$MODE" == "mode=live" ]; then
+  if [ "$MODE" = "mode=live" ]; then
     if [ -f $APP_PATH/*/conf/live.application.conf ]; then
       CONFIG_FILE="live.application.conf"
     fi

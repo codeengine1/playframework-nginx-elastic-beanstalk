@@ -1,6 +1,7 @@
 #!/bin/sh
 
 # run as root
+# wheezy: last tested on 2015/02/18
 
 # add unstable repos
 echo -e "\n\n#### unstable #########\ndeb http://ftp.us.debian.org/debian unstable main contrib non-free\n\n" >> /etc/apt/sources.list
@@ -99,18 +100,18 @@ mkdir /var/app
 
 echo 'Downloading Playframework ...'
 cd /opt/
-wget -P /opt/ -O /opt/activator.zip http://downloads.typesafe.com/typesafe-activator/1.2.12/typesafe-activator-1.2.12.zip
-unzip /opt/activator.zip
-rm -f /opt/activator.zip
-chmod a+x /opt/activator-1.2.12/activator
+wget -P /opt/ http://downloads.typesafe.com/typesafe-activator/1.2.12/typesafe-activator-1.2.12-minimal.zip
+unzip /opt/typesafe-activator-1.2.12-minimal.zip
+rm -f /opt/typesafe-activator-1.2.12-minimal.zip
+chmod a+x /opt/activator-1.2.12-minimal/activator
 
 echo 'Adding Play to the PATH ...'
-export PATH=$PATH:/opt/activator-1.2.12/
 echo '#! /bin/sh
-export PATH=$PATH:/opt/activator-1.2.12/
+export PATH=$PATH:/opt/activator-1.2.12-minimal/
 ' > /etc/profile.d/play.sh
 chmod +x /etc/profile.d/play.sh
 source /etc/profile.d/play.sh
+unset DISPLAY
 
 echo 'Adding play startup script'
 wget -O /etc/init.d/play https://raw.githubusercontent.com/davemaple/playframework-nginx-elastic-beanstalk/master/play
@@ -129,18 +130,16 @@ mkdir /opt/elasticbeanstalk/deploy/configuration
 echo 'Downloading sample test app for play'
 wget -O /opt/elasticbeanstalk/deploy/appsource/source_bundle https://github.com/davemaple/playframework-example-application-mode/blob/master/playtest.zip?raw=true
 
+echo 'Loading base configuration'
+wget -O /opt/elasticbeanstalk/deploy/configuration/containerconfiguration https://raw.githubusercontent.com/davemaple/playframework-nginx-elastic-beanstalk/master/containerconfig/debian-basic.json
+
 echo 'Starting up play'
 sudo service play start
 
 echo 'Reconfiguring monit ... '
-cp -f /opt/elasticbeanstalk/containerfiles/monit.conf /etc/monit.d/monit.conf
+wget -O /etc/monit/conf.d/monit.conf https://raw.githubusercontent.com/davemaple/playframework-nginx-elastic-beanstalk/master/elasticbeanstalk/containerfiles/monit.conf
 echo 'Restarting monit service ...'
 sudo service monit restart
-
-echo 'Cleaning up ... '
-yum -y remove git
-cd /root
-rm -fR /home/ec2-user/*
 
 
 

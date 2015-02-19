@@ -104,17 +104,17 @@ mkdir /var/app
 
 echo 'Downloading Playframework ...'
 cd /opt/
-wget -P /opt/ http://downloads.typesafe.com/typesafe-activator/1.2.10/typesafe-activator-1.2.10-minimal.zip
-unzip /opt/typesafe-activator-1.2.10-minimal.zip
-rm -f /opt/typesafe-activator-1.2.10-minimal.zip
-chmod a+x /opt/activator-1.2.10-minimal/activator
+wget -P /opt/ http://downloads.typesafe.com/typesafe-activator/1.2.12/typesafe-activator-1.2.12-minimal.zip
+unzip /opt/typesafe-activator-1.2.12-minimal.zip
+rm -f /opt/typesafe-activator-1.2.12-minimal.zip
+chmod a+x /opt/activator-1.2.12-minimal/activator
 
 echo 'Adding Play to the PATH ...'
-export PATH=$PATH:/opt/activator-1.2.10-minimal/
 echo '#! /bin/sh
-export PATH=$PATH:/opt/activator-1.2.10-minimal/
+export PATH=$PATH:/opt/activator-1.2.12-minimal/
 ' > /etc/profile.d/play.sh
 chmod +x /etc/profile.d/play.sh
+source /etc/profile.d/play.sh
 
 echo 'Test script for Elastic Beanstalk ...'
 echo '#! /bin/sh
