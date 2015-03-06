@@ -115,6 +115,10 @@ server {
 
     #set the default location
     location /assets/ {
+        proxy_set_header        Host $host;
+        proxy_set_header        X-Real-IP $remote_addr;
+        proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header        X-Forwarded-Proto $scheme;
         proxy_cache assets;
         proxy_cache_valid 200 180m;
         expires max;
@@ -126,15 +130,23 @@ server {
     location /websocket/ {
         proxy_pass http://127.0.0.1:9000/websocket/;
         proxy_http_version 1.1;
+        proxy_set_header        Host $host;
+        proxy_set_header        X-Real-IP $remote_addr;
+        proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header        X-Forwarded-Proto $scheme;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade"; 
     }
 
     location / {
-         add_header Cache-Control "no-store, must-revalidate";
-         add_header Pragma no-cache;
-         expires epoch;
-         proxy_pass         http://127.0.0.1:9000/;
+        proxy_set_header        Host $host;
+        proxy_set_header        X-Real-IP $remote_addr;
+        proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header        X-Forwarded-Proto $scheme;
+        add_header Cache-Control "no-store, must-revalidate";
+        add_header Pragma no-cache;
+        expires epoch;
+        proxy_pass         http://127.0.0.1:9000/;
     }
 }
 ' > /etc/nginx/conf.d/playframework.conf
