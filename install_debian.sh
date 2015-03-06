@@ -208,3 +208,9 @@ echo 'Reconfiguring monit ... '
 wget -O /etc/monit/conf.d/monit.conf https://raw.githubusercontent.com/davemaple/playframework-nginx-elastic-beanstalk/master/elasticbeanstalk/containerfiles/monit.conf
 echo 'Restarting monit service ...'
 sudo service monit restart
+
+echo 'Getting CA Certs'
+sudo apt-get install --reinstall ca-certificates-java
+sudo update-ca-certificates
+rm /etc/ssl/certs/java/cacerts
+/var/lib/dpkg/info/ca-certificates-java.postinst configure
