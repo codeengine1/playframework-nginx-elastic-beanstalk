@@ -58,6 +58,7 @@ start() {
 }
 
 stop() {
+  /usr/bin/monit unmonitor play
   PLAY_PROCESS=""
 
   if [ -f /var/run/play.pid ]; then
