@@ -8,8 +8,8 @@
 	</tr>
 	<tr>
 		<td>Latest Public AMI:</td>
-		<td><strong>ami-ee1d5a86</strong></td>
-		<td>January 28, 2015 (immune from GHOST)</td>
+		<td><strong>ami-ea032a82</strong></td>
+		<td>March 23, 2015</td>
 	</tr>
 </table>
 
