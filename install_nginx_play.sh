@@ -6,7 +6,8 @@
 
 # update dns cache TTL to 60 seconds
 echo '
-networkaddress.cache.ttl = 0\nnetworkaddress.cache.negative.ttl = 0
+networkaddress.cache.ttl = 0
+networkaddress.cache.negative.ttl = 0
 ' >> /usr/lib/jvm/jre/lib/security/java.security
 
 yum -y update
@@ -21,6 +22,11 @@ echo 'Creating nginx cache directory'
 mkdir /data
 mkdir /data/nginx
 mkdir /data/nginx/cache
+
+echo 'Installing local memcached...'
+yum -y install memcached
+service memcached start
+/sbin/chkconfig memcached on
 
 echo 'Installing nginx...'
 yum -y install nginx

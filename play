@@ -17,6 +17,9 @@ APP_PATH="/var/app/$APP"
 
 start() {
 
+  rm -f /var/run/play.pid
+  /usr/bin/monit unmonitor play
+
   cp /opt/elasticbeanstalk/deploy/appsource/source_bundle /var/app/playapp.zip
   rm -fR $APP_PATH/*
   unzip "$APP_PATH.zip" -d $APP_PATH
@@ -43,12 +46,13 @@ start() {
     fi
   fi
 
-	PLAY_BIN=`find $APP_PATH/*/bin -not -name "*.bat" -not -type d`
+  PLAY_BIN=`find $APP_PATH/*/bin -not -name "*.bat" -not -type d`
   PLAY_XMS="$( cat /opt/elasticbeanstalk/deploy/configuration/containerconfiguration | jq --raw-output '.optionsettings."aws:elasticbeanstalk:container:tomcat:jvmoptions" | .[] | if startswith("Xms=") then . else "" end ' | xargs echo $1 | tr -d 'Xms=' | tr -d '\n' )m"
   PLAY_XMX="$( cat /opt/elasticbeanstalk/deploy/configuration/containerconfiguration | jq --raw-output '.optionsettings."aws:elasticbeanstalk:container:tomcat:jvmoptions" | .[] | if startswith("Xmx=") then . else "" end ' | xargs echo $1 | tr -d 'Xmx=' | tr -d '\n' )m"
   PLAY_COMMAND="$PLAY_BIN -J-Xms$PLAY_XMS -J-Xmx$PLAY_XMX -Dpidfile.path=/var/run/play.pid -Dconfig.file=/var/app/current/conf/$CONFIG_FILE -Dsun.net.inetaddr.ttl=0 -Dsun.net.inetaddr.negative.ttl=0"
   $PLAY_COMMAND>/dev/null 2>&1 &
 
+  sleep 5
   /usr/bin/monit monitor play
   return 0
 }
