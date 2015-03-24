@@ -64,11 +64,11 @@ stop() {
   if [ -f /var/run/play.pid ]; then
     PLAY_PROCESS=$(cat /var/run/play.pid)
   else 
-    PLAY_PROCESS=$(ps aux | grep '[p]lay' | awk '{print $2}')
+    PLAY_PROCESS=$(ps aux | grep 'play.pid' | awk '{print $2}')
   fi
-
+  
   if [ "$PLAY_PROCESS" != "" ]; then
-    kill $PLAY_PROCESS > /dev/null 2>&1
+    (kill $PLAY_PROCESS >/dev/null 2>&1 &) >/dev/null
   fi
 
   return 0
