@@ -68,7 +68,7 @@ stop() {
   fi
 
   if [ "$PLAY_PROCESS" != "" ]; then
-    kill $PLAY_PROCESS
+    kill $PLAY_PROCESS > /dev/null 2>&1
   fi
 
   return 0
