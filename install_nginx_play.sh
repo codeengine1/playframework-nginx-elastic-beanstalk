@@ -104,11 +104,6 @@ rm -f /etc/monit.d/monit-apache.conf
 
 echo 'Nginx is installed'
 
-echo 'Reconfiguring monit ... '
-cp -f /opt/elasticbeanstalk/containerfiles/monit.conf /etc/monit.d/monit.conf
-echo 'Restarting monit service ...'
-sudo service monit restart
-
 echo 'Creating app directory'
 mkdir /var/app
 
@@ -152,10 +147,10 @@ wget --output-document /var/app/playapp.zip https://github.com/davemaple/playfra
 cp /var/app/playapp.zip /opt/elasticbeanstalk/deploy/appsource/source_bundle
 
 echo 'Starting nginx'
-sudo monit nginx start
+sudo service nginx start
 
 echo 'Starting up play'
-sudo monit play start
+sudo service play start
 
 echo 'Configuring Elastic Beanstalk for Playframework deployment ... '
 cd /home/ec2-user
@@ -173,11 +168,16 @@ rm -f /etc/logrotate.d/logrotate.elasticbeanstalk.tomcat8.conf
 rm -f /etc/logrotate.d/logrotate.elasticbeanstalk.httpd.conf
 rm -f /etc/logrotate.d/httpd
 sudo yum install -y awslogs
-cp /home/ec2-user/playframework-nginx-elastic-beanstalk/awscli.conf /etc/awslogs/awscli.conf
+cp -f /home/ec2-user/playframework-nginx-elastic-beanstalk/awslogs.conf /etc/awslogs/awslogs.conf
 ELASTIC_BEANSTALK_ENVIRONMENT="$( ebname.py )"
-sed -i "s/{environment_name}/$ELASTIC_BEANSTALK_ENVIRONMENT/g" /etc/awslogs/awscli.conf
+sed -i "s/{environment_name}/$ELASTIC_BEANSTALK_ENVIRONMENT/g" /etc/awslogs/awslogs.conf
 sudo chkconfig awslogs on
-monit awslogs start
+service awslogs start
+
+echo 'Reconfiguring monit ... '
+cp -f /opt/elasticbeanstalk/containerfiles/monit.conf /etc/monit.d/monit.conf
+echo 'Restarting monit service ...'
+sudo service monit restart
 
 echo 'Cleaning up ... '
 yum -y remove git
