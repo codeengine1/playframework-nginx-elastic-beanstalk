@@ -50,20 +50,35 @@ proxy_buffer_size         16k;
 proxy_buffers             32              16k;
 proxy_busy_buffers_size   64k;' > /etc/nginx/conf.d/proxy.conf
 
-echo '
+echo $'
 proxy_cache_path /data/nginx/cache keys_zone=assets:10m max_size=2000m;
 
-log_format playframework ''$remote_addr "$cookie_visitorId" $time_iso8601 "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent" $body_bytes_sent $msec $request_time'';
+log_format playframework \'$remote_addr "$cookie_visitorId" $time_iso8601 "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent" $body_bytes_sent $msec $request_time\';
 
 real_ip_header X-Forwarded-For;
 set_real_ip_from 10.0.0.0/8;
 real_ip_recursive on;
 
 server {
+
  listen 80;
  server_name _;
  access_log /var/log/nginx/access.log playframework;
  error_log /var/log/nginx/error.log;
+ 
+  ## Start: Size Limits & Buffer Overflows ##
+  client_body_buffer_size  1K;
+  client_header_buffer_size 1k;
+  client_max_body_size 64k;
+  large_client_header_buffers 2 8k;
+  ## END: Size Limits & Buffer Overflows ##
+  
+  ## Start: Timeouts ##
+  client_body_timeout   10;
+  client_header_timeout 10;
+  keepalive_timeout     5 5;
+  send_timeout          10;
+  ## End: Timeouts ##
 
  #set the default location
  location /assets/ {
@@ -146,6 +161,15 @@ cd /home/ec2-user/
 wget --output-document /var/app/playapp.zip https://github.com/davemaple/playframework-example-application-mode/blob/master/playtest.zip?raw=true
 cp /var/app/playapp.zip /opt/elasticbeanstalk/deploy/appsource/source_bundle
 
+echo 'Configuring Elastic Beanstalk for Playframework deployment ... '
+cd /home/ec2-user
+rm -fR /opt/elasticbeanstalk/hooks
+cp -a /home/ec2-user/playframework-nginx-elastic-beanstalk/elasticbeanstalk/hooks /opt/elasticbeanstalk/
+rm -fR /opt/elasticbeanstalk/tasks
+cp -a /home/ec2-user/playframework-nginx-elastic-beanstalk/elasticbeanstalk/tasks /opt/elasticbeanstalk/
+rm -fR /opt/elasticbeanstalk/containerfiles
+cp -a /home/ec2-user/playframework-nginx-elastic-beanstalk/elasticbeanstalk/containerfiles /opt/elasticbeanstalk/
+
 echo 'Starting nginx'
 sudo service nginx start
 
@@ -156,15 +180,6 @@ sudo service monit restart
 
 echo 'Starting up play'
 sudo service play start
-
-echo 'Configuring Elastic Beanstalk for Playframework deployment ... '
-cd /home/ec2-user
-rm -fR /opt/elasticbeanstalk/hooks
-cp -a /home/ec2-user/playframework-nginx-elastic-beanstalk/elasticbeanstalk/hooks /opt/elasticbeanstalk/
-rm -fR /opt/elasticbeanstalk/tasks
-cp -a /home/ec2-user/playframework-nginx-elastic-beanstalk/elasticbeanstalk/tasks /opt/elasticbeanstalk/
-rm -fR /opt/elasticbeanstalk/containerfiles
-cp -a /home/ec2-user/playframework-nginx-elastic-beanstalk/elasticbeanstalk/containerfiles /opt/elasticbeanstalk/
 
 echo 'Configuring logs ...'
 cp /home/ec2-user/playframework-nginx-elastic-beanstalk/ebname.py /usr/bin/ebname.py
