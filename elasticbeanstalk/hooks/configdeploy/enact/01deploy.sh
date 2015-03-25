@@ -17,4 +17,3 @@
 
 set -xe
 
-cp /tmp/deployment/config/tomcat7 /etc/sysconfig/tomcat7

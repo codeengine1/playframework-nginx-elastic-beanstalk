@@ -16,11 +16,5 @@
 
 set -xe
 
-if /etc/init.d/play status
-then
-  /etc/init.d/play stop
-fi
-
-/etc/init.d/play start
-
-/etc/init.d/nginx restart
+monit play restart
+monit nginx restart

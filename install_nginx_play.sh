@@ -62,8 +62,8 @@ real_ip_recursive on;
 server {
  listen 80;
  server_name _;
- access_log /var/log/httpd/elasticbeanstalk-access_log playframework;
- error_log /var/log/httpd/elasticbeanstalk-error_log;
+ access_log /var/log/nginx/access.log playframework;
+ error_log /var/log/nginx/error.log;
 
  #set the default location
  location /assets/ {
@@ -102,10 +102,12 @@ echo 'Removing apache...'
 yum -y remove httpd
 rm -f /etc/monit.d/monit-apache.conf
 
-echo 'Restarting nginx'
-sudo service nginx restart
-
 echo 'Nginx is installed'
+
+echo 'Reconfiguring monit ... '
+cp -f /opt/elasticbeanstalk/containerfiles/monit.conf /etc/monit.d/monit.conf
+echo 'Restarting monit service ...'
+sudo service monit restart
 
 echo 'Creating app directory'
 mkdir /var/app
@@ -149,8 +151,11 @@ cd /home/ec2-user/
 wget --output-document /var/app/playapp.zip https://github.com/davemaple/playframework-example-application-mode/blob/master/playtest.zip?raw=true
 cp /var/app/playapp.zip /opt/elasticbeanstalk/deploy/appsource/source_bundle
 
+echo 'Starting nginx'
+sudo monit nginx start
+
 echo 'Starting up play'
-sudo service play start
+sudo monit play start
 
 echo 'Configuring Elastic Beanstalk for Playframework deployment ... '
 cd /home/ec2-user
@@ -161,10 +166,18 @@ cp -a /home/ec2-user/playframework-nginx-elastic-beanstalk/elasticbeanstalk/task
 rm -fR /opt/elasticbeanstalk/containerfiles
 cp -a /home/ec2-user/playframework-nginx-elastic-beanstalk/elasticbeanstalk/containerfiles /opt/elasticbeanstalk/
 
-echo 'Reconfiguring monit ... '
-cp -f /opt/elasticbeanstalk/containerfiles/monit.conf /etc/monit.d/monit.conf
-echo 'Restarting monit service ...'
-sudo service monit restart
+echo 'Configuring logs ...'
+cp /home/ec2-user/playframework-nginx-elastic-beanstalk/ebname.py /usr/bin/ebname.py
+chmod +x /usr/bin/ebname.py
+rm -f /etc/logrotate.d/logrotate.elasticbeanstalk.tomcat8.conf
+rm -f /etc/logrotate.d/logrotate.elasticbeanstalk.httpd.conf
+rm -f /etc/logrotate.d/httpd
+sudo yum install -y awslogs
+cp /home/ec2-user/playframework-nginx-elastic-beanstalk/awscli.conf /etc/awslogs/awscli.conf
+ELASTIC_BEANSTALK_ENVIRONMENT="$( ebname.py )"
+sed -i "s/{environment_name}/$ELASTIC_BEANSTALK_ENVIRONMENT/g" /etc/awslogs/awscli.conf
+sudo chkconfig awslogs on
+monit awslogs start
 
 echo 'Cleaning up ... '
 yum -y remove git
