@@ -40,3 +40,19 @@ cat > /opt/elasticbeanstalk/tasks/publishlogs.d/play.conf <<EOLPUBLOG
 /var/app/current/logs/*.gz
 EOLPUBLOG
 
+cat > /opt/elasticbeanstalk/tasks/taillogs.d/play.conf <<EOLTAILLOG
+/var/log/nginx/*.log
+EOLTAILLOG
+
+
+cat > /opt/elasticbeanstalk/tasks/systemtaillogs.d/play.conf <<EOLSYSTAILLOG
+/var/log/nginx/*.log
+EOLSYSTAILLOG
+
+cat > /opt/elasticbeanstalk/tasks/bundlelogs.d/play.conf <<EOLBUNDLELOG
+/var/log/nginx/*.log
+EOLBUNDLELOG
+
+cat > /opt/elasticbeanstalk/tasks/publishlogs.d/play.conf <<EOLPUBLOG
+/var/log/nginx/*.log
+EOLPUBLOG
