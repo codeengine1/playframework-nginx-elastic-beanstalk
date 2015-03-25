@@ -173,11 +173,6 @@ cp -a /home/ec2-user/playframework-nginx-elastic-beanstalk/elasticbeanstalk/cont
 echo 'Starting nginx'
 sudo service nginx start
 
-echo 'Reconfiguring monit ... '
-cp -f /opt/elasticbeanstalk/containerfiles/monit.conf /etc/monit.d/monit.conf
-echo 'Restarting monit service ...'
-sudo service monit restart
-
 echo 'Starting up play'
 sudo service play start
 
@@ -193,6 +188,11 @@ ELASTIC_BEANSTALK_ENVIRONMENT="$( ebname.py )"
 sed -i "s/{environment_name}/$ELASTIC_BEANSTALK_ENVIRONMENT/g" /etc/awslogs/awslogs.conf
 sudo chkconfig awslogs on
 service awslogs start
+
+echo 'Reconfiguring monit ... '
+cp -f /opt/elasticbeanstalk/containerfiles/monit.conf /etc/monit.d/monit.conf
+echo 'Restarting monit service ...'
+sudo service monit restart
 
 echo 'Cleaning up ... '
 yum -y remove git
