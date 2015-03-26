@@ -25,8 +25,12 @@ fi
 
 /etc/init.d/nginx restart
 
-monit stop awslogs
+sleep 2
+/usr/bin/monit unmonitor awslogs
+service awslogs stop
 cp -f /opt/elasticbeanstalk/containerfiles/awslogs.conf /etc/awslogs/awslogs.conf
 ELASTIC_BEANSTALK_ENVIRONMENT="$( ebname.py )"
 sed -i "s/{environment_name}/$ELASTIC_BEANSTALK_ENVIRONMENT/g" /etc/awslogs/awslogs.conf
-monit start awslogs
+sleep 2
+service awslogs start
+/usr/bin/monit monitor awslogs
