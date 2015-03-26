@@ -8,7 +8,7 @@
 	</tr>
 	<tr>
 		<td>Latest Public AMI:</td>
-		<td><strong>ami-7c5a7114</strong></td>
+		<td><strong>ami-da517ab2</strong></td>
 		<td>March 25, 2015</td>
 	</tr>
 </table>
