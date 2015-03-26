@@ -24,3 +24,9 @@ fi
 /etc/init.d/play start
 
 /etc/init.d/nginx restart
+
+monit stop awslogs
+cp -f /opt/elasticbeanstalk/containerfiles/awslogs.conf /etc/awslogs/awslogs.conf
+ELASTIC_BEANSTALK_ENVIRONMENT="$( ebname.py )"
+sed -i "s/{environment_name}/$ELASTIC_BEANSTALK_ENVIRONMENT/g" /etc/awslogs/awslogs.conf
+monit start awslogs

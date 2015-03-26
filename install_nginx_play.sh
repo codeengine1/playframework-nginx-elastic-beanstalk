@@ -194,6 +194,9 @@ cp -f /opt/elasticbeanstalk/containerfiles/monit.conf /etc/monit.d/monit.conf
 echo 'Restarting monit service ...'
 sudo service monit restart
 
+echo 'Creating awslogs template ... '
+cp -f /home/ec2-user/playframework-nginx-elastic-beanstalk/awslogs.conf /opt/elasticbeanstalk/containerfiles/awslogs.conf
+
 echo 'Cleaning up ... '
 yum -y remove git
 cd /root
