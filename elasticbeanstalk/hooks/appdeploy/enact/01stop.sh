@@ -16,7 +16,5 @@
 
 set -xe
 
-if /etc/init.d/play status
-then
-  /etc/init.d/play stop
-fi
+monit stop play
+sleep 5

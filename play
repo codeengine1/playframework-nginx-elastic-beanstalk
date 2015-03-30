@@ -17,8 +17,6 @@ APP_PATH="/var/app/$APP"
 
 start() {
 
-  /usr/bin/monit unmonitor play
-  sleep 15
   rm -f /var/run/play.pid
 
   cp /opt/elasticbeanstalk/deploy/appsource/source_bundle /var/app/playapp.zip
@@ -53,15 +51,10 @@ start() {
   PLAY_COMMAND="$PLAY_BIN -J-Xms$PLAY_XMS -J-Xmx$PLAY_XMX -Dpidfile.path=/var/run/play.pid -Dconfig.file=/var/app/current/conf/$CONFIG_FILE -Dsun.net.inetaddr.ttl=0 -Dsun.net.inetaddr.negative.ttl=0 -J-XX:+CMSClassUnloadingEnabled -J-XX:+UseConcMarkSweepGC"
   $PLAY_COMMAND>/dev/null 2>&1 &
 
-  sleep 5
-  /usr/bin/monit monitor play
-  sleep 15
   return 0
 }
 
 stop() {
-  monit unmonitor play
-  sleep 15
   PLAY_PROCESS=""
 
   if [ -f /var/run/play.pid ]; then

@@ -16,5 +16,5 @@
 
 set -xe
 
-monit play restart
-monit nginx restart
+monit restart play
+monit restart nginx
