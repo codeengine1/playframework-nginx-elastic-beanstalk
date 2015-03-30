@@ -105,7 +105,7 @@ echo 'Starting up play'
 sudo service play start
 
 echo 'Reconfiguring monit ... '
-wget -O /etc/monit/conf.d/monit.debian.conf https://raw.githubusercontent.com/davemaple/playframework-nginx-elastic-beanstalk/master/elasticbeanstalk/containerfiles/monit.conf
+wget -O /etc/monit/conf.d/monit.debian.conf https://raw.githubusercontent.com/davemaple/playframework-nginx-elastic-beanstalk/master/elasticbeanstalk/containerfiles/monit.debian.conf
 echo 'Restarting monit service ...'
 sudo service monit restart
 

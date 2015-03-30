@@ -17,8 +17,9 @@ APP_PATH="/var/app/$APP"
 
 start() {
 
-  rm -f /var/run/play.pid
   /usr/bin/monit unmonitor play
+  sleep 15
+  rm -f /var/run/play.pid
 
   cp /opt/elasticbeanstalk/deploy/appsource/source_bundle /var/app/playapp.zip
   rm -fR $APP_PATH/*
@@ -54,11 +55,13 @@ start() {
 
   sleep 5
   /usr/bin/monit monitor play
+  sleep 15
   return 0
 }
 
 stop() {
-  /usr/bin/monit unmonitor play
+  monit unmonitor play
+  sleep 15
   PLAY_PROCESS=""
 
   if [ -f /var/run/play.pid ]; then
