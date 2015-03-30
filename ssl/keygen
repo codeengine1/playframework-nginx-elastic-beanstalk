@@ -1,0 +1,3 @@
+#/bin/bash
+rm -f ssl.key ssl.crt
+sudo openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout ssl.key -out ssl.crt -subj "/C=US/ST=New Hampshire/L=Madison/O=David Maple LLC./OU=Web Administration/CN=davemaple.com"
