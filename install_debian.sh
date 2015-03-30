@@ -21,7 +21,7 @@ echo '
 apt-get update
 
 # install monit
-sudo apt-get install monit
+sudo apt-get -y install monit
 
 # install java
 apt-get -y --no-install-recommends --force-yes -t unstable install openjdk-8-jdk
@@ -49,122 +49,7 @@ sed -i 's/worker_processes 4;/worker_processes 1;/g' /etc/nginx/nginx.conf
 sed -i 's/worker_connections 768;/worker_connections 1024;/g' /etc/nginx/nginx.conf
 sed -i '/sites-enabled/d' /etc/nginx/nginx.conf
 
-echo 'Creating configuration files'
-echo 'proxy_redirect      off;
-proxy_set_header          Host            $host;
-proxy_set_header          X-Real-IP       $remote_addr;
-proxy_set_header          X-Forwarded-For $proxy_add_x_forwarded_for;
-client_max_body_size      10m;
-client_body_buffer_size   128k;
-client_header_buffer_size 64k;
-proxy_connect_timeout     90;
-proxy_send_timeout        90;
-proxy_read_timeout        90;
-proxy_buffer_size         16k;
-proxy_buffers             32              16k;
-proxy_busy_buffers_size   64k;' > /etc/nginx/conf.d/proxy.conf
-
-echo $'
-proxy_cache_path /data/nginx/cache keys_zone=assets:10m max_size=2000m;
-
-log_format playframework \'$remote_addr "$cookie_visitorId" $time_iso8601 "$request" $status $request_length $body_bytes_sent "$http_referer" "$http_user_agent" $body_bytes_sent $msec $request_time\';
-
-real_ip_header X-Forwarded-For;
-set_real_ip_from 10.0.0.0/8;
-real_ip_recursive on;
-
-server {
-
-    listen 80;
-    server_name _;
-    access_log /var/log/nginx/play.access.log playframework;
-    error_log /var/log/nginx/play.error.log;
-    
-    ## Start: Size Limits & Buffer Overflows ##
-	client_body_buffer_size  1K;
-	client_header_buffer_size 1k;
-	client_max_body_size 64k;
-	large_client_header_buffers 2 8k;
-	## END: Size Limits & Buffer Overflows ##
-  
-	## Start: Timeouts ##
-	client_body_timeout   10;
-	client_header_timeout 10;
-	keepalive_timeout     5 5;
-	send_timeout          10;
-	## End: Timeouts ##
-
-    #set the default location
-    location /assets/ {
-        proxy_cache assets;
-        proxy_cache_valid 200 180m;
-        expires max;
-        add_header Cache-Control public;
-        proxy_pass         http://127.0.0.1:9000/assets/;
-    }
-
-    #websocket support
-    location /websocket/ {
-        proxy_pass http://127.0.0.1:9000/websocket/;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade"; 
-    }
-
-    location / {
-        add_header Cache-Control "no-store, must-revalidate";
-        add_header Pragma no-cache;
-        expires epoch;
-        proxy_pass         http://127.0.0.1:9000/;
-    }
-}
-
-server {
-    listen 443;
-    server_name _;
-    access_log /var/log/nginx/ssl.play.access.log playframework;
-    error_log /var/log/nginx/ssl.play.error.log;
-    ssl on;
-    ssl_certificate     /opt/elasticbeanstalk/deploy/ssl/ssl.crt;
-    ssl_certificate_key /opt/elasticbeanstalk/deploy/ssl/ssl.key;
-
-    #set the default location
-    location /assets/ {
-        proxy_set_header        Host $host;
-        proxy_set_header        X-Real-IP $remote_addr;
-        proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header        X-Forwarded-Proto $scheme;
-        proxy_cache assets;
-        proxy_cache_valid 200 180m;
-        expires max;
-        add_header Cache-Control public;
-        proxy_pass         http://127.0.0.1:9000/assets/;
-    }
-
-    #websocket support
-    location /websocket/ {
-        proxy_pass http://127.0.0.1:9000/websocket/;
-        proxy_http_version 1.1;
-        proxy_set_header        Host $host;
-        proxy_set_header        X-Real-IP $remote_addr;
-        proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header        X-Forwarded-Proto $scheme;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade"; 
-    }
-
-    location / {
-        proxy_set_header        Host $host;
-        proxy_set_header        X-Real-IP $remote_addr;
-        proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header        X-Forwarded-Proto $scheme;
-        add_header Cache-Control "no-store, must-revalidate";
-        add_header Pragma no-cache;
-        expires epoch;
-        proxy_pass         http://127.0.0.1:9000/;
-    }
-}
-' > /etc/nginx/conf.d/playframework.conf
+wget -O /etc/nginx/conf.d/debian.conf https://raw.githubusercontent.com/davemaple/playframework-nginx-elastic-beanstalk/master/nginx/debian.conf
 
 echo 'Creating source deployment directory ...'
 mkdir /opt/elasticbeanstalk
