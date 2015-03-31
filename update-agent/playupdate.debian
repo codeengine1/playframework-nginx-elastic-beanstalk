@@ -7,7 +7,7 @@ chmod +x /etc/init.d/play
 sed -i '/rc.d/d' /etc/init.d/play
 
 wget -O /etc/nginx/conf.d/beanstalk.conf https://raw.githubusercontent.com/davemaple/playframework-nginx-elastic-beanstalk/master/nginx/debian.conf?random=$RANDOM
-wget -O /etc/monit.d/monit.conf https://raw.githubusercontent.com/davemaple/playframework-nginx-elastic-beanstalk/master/elasticbeanstalk/containerfiles/monit.debian.conf?random=$RANDOM
+wget -O /etc/monit/conf.d/monit.conf https://raw.githubusercontent.com/davemaple/playframework-nginx-elastic-beanstalk/master/elasticbeanstalk/containerfiles/monit.debian.conf?random=$RANDOM
 
 service monit restart
 monit restart nginx
