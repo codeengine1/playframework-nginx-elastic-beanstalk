@@ -114,3 +114,6 @@ sudo apt-get install --reinstall ca-certificates-java
 sudo update-ca-certificates
 rm /etc/ssl/certs/java/cacerts
 /var/lib/dpkg/info/ca-certificates-java.postinst configure
+
+echo 'Install update agent'
+
