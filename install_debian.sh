@@ -116,4 +116,5 @@ rm /etc/ssl/certs/java/cacerts
 /var/lib/dpkg/info/ca-certificates-java.postinst configure
 
 echo 'Install update agent'
-
+wget -O /usr/bin/playupdate https://raw.githubusercontent.com/davemaple/playframework-nginx-elastic-beanstalk/master/update-agent/playupdate.debian
+chmod +x /usr/bin/playupdate

@@ -129,5 +129,8 @@ yum -y remove git
 cd /root
 rm -fR /home/ec2-user/*
 
+echo 'Install update agent'
+wget -O /usr/bin/playupdate https://raw.githubusercontent.com/davemaple/playframework-nginx-elastic-beanstalk/master/update-agent/playupdate
+chmod +x /usr/bin/playupdate
 
 
