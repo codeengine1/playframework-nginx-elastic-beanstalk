@@ -8,8 +8,8 @@
 	</tr>
 	<tr>
 		<td>Latest Public AMI:</td>
-		<td><strong>ami-da517ab2</strong></td>
-		<td>March 25, 2015</td>
+		<td><strong>ami-04182e6c</strong></td>
+		<td>April 1st, 2015</td>
 	</tr>
 </table>
 
