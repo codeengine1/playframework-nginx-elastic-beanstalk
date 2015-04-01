@@ -23,9 +23,14 @@ cp -f /opt/elasticbeanstalk/containerfiles/awslogs.conf /etc/awslogs/awslogs.con
 ELASTIC_BEANSTALK_ENVIRONMENT="$( ebname.py )"
 sed -i "s/{environment_name}/$ELASTIC_BEANSTALK_ENVIRONMENT/g" /etc/awslogs/awslogs.conf
 
-service monit start
+service play restart
+service awslogs restart
+service nginx stop
+sleep 2
+rm -fR /data/nginx/cache/*
+service nginx start
+
 sleep 5
 
-monit restart play
-monit restart nginx
-monit restart awslogs
+service monit start
+sleep 5

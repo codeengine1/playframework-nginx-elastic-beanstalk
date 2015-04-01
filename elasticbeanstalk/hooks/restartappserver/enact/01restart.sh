@@ -16,5 +16,4 @@
 
 set -xe
 
-monit restart play
-monit restart nginx
+../../appdeploy/post/01start.sh

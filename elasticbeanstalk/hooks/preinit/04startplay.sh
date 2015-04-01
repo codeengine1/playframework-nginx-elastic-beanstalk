@@ -17,4 +17,4 @@
 
 set -xe
 
-monit restart play
+../appdeploy/post/01start.sh
