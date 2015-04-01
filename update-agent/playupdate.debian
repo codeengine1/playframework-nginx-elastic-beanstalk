@@ -2,6 +2,8 @@
 
 RANDOM=$( openssl rand -base64 32 )
 
+rm -f /etc/nginx/conf.d/*.conf
+
 wget -O /etc/init.d/play https://raw.githubusercontent.com/davemaple/playframework-nginx-elastic-beanstalk/master/play?random=$RANDOM
 chmod +x /etc/init.d/play
 sed -i '/rc.d/d' /etc/init.d/play

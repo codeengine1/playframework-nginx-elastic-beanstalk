@@ -118,3 +118,7 @@ rm /etc/ssl/certs/java/cacerts
 echo 'Install update agent'
 wget -O /usr/bin/playupdate https://raw.githubusercontent.com/davemaple/playframework-nginx-elastic-beanstalk/master/update-agent/playupdate.debian
 chmod +x /usr/bin/playupdate
+
+echo 'Installing NTP'
+sudo apt-get -y install ntp
+date ; sudo service ntp stop ; sudo ntpdate -s time.nist.gov ; sudo service ntp start ; date
