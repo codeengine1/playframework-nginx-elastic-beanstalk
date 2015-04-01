@@ -28,3 +28,4 @@ sleep 5
 
 monit restart play
 monit restart nginx
+monit restart awslogs
