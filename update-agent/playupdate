@@ -12,5 +12,6 @@ wget -O /opt/elasticbeanstalk/hooks/appdeploy/post/01start.sh https://raw.github
 wget -O /opt/elasticbeanstalk/hooks/appdeploy/enact/01stop.sh https://raw.githubusercontent.com/davemaple/playframework-nginx-elastic-beanstalk/master/elasticbeanstalk/hooks/appdeploy/enact/01stop.sh?random=$RANDOM
 
 service monit restart
+sleep 5
 monit restart nginx
 monit restart play
