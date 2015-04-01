@@ -18,10 +18,13 @@ set -xe
 
 service monit stop
 
-sleep 2
+sleep 5
 cp -f /opt/elasticbeanstalk/containerfiles/awslogs.conf /etc/awslogs/awslogs.conf
 ELASTIC_BEANSTALK_ENVIRONMENT="$( ebname.py )"
 sed -i "s/{environment_name}/$ELASTIC_BEANSTALK_ENVIRONMENT/g" /etc/awslogs/awslogs.conf
-sleep 2
 
 service monit start
+sleep 5
+
+monit restart play
+monit restart nginx
