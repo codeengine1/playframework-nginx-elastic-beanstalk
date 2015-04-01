@@ -2,6 +2,7 @@
 
 RANDOM=$( openssl rand -base64 32 )
 
+mkdir -p /etc/nginx/inc
 rm -f /etc/nginx/conf.d/*.conf
 
 wget -O /etc/init.d/play https://raw.githubusercontent.com/davemaple/playframework-nginx-elastic-beanstalk/master/play?random=$RANDOM
@@ -9,6 +10,7 @@ chmod +x /etc/init.d/play
 sed -i '/rc.d/d' /etc/init.d/play
 
 wget -O /etc/nginx/conf.d/debian.conf https://raw.githubusercontent.com/davemaple/playframework-nginx-elastic-beanstalk/master/nginx/debian.conf?random=$RANDOM
+wget -O /etc/nginx/inc/proxy.conf https://raw.githubusercontent.com/davemaple/playframework-nginx-elastic-beanstalk/master/nginx/proxy.conf?random=$RANDOM
 wget -O /etc/monit/conf.d/monit.conf https://raw.githubusercontent.com/davemaple/playframework-nginx-elastic-beanstalk/master/elasticbeanstalk/containerfiles/monit.debian.conf?random=$RANDOM
 
 service monit restart

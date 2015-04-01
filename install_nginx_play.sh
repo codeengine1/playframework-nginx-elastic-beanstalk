@@ -31,11 +31,13 @@ service memcached start
 echo 'Installing nginx...'
 yum -y install nginx
 
+mkdir /etc/nginx/inc
 echo 'Fixing nginx configuration'
 sed -i 's/worker_processes  1;/worker_processes  2;/g' /etc/nginx/nginx.conf
 rm -f /etc/nginx/conf.d/virtual.conf
 
 wget -O /etc/nginx/conf.d/beanstalk.conf https://raw.githubusercontent.com/davemaple/playframework-nginx-elastic-beanstalk/master/nginx/beanstalk.conf
+wget -O /etc/nginx/inc/proxy.conf https://raw.githubusercontent.com/davemaple/playframework-nginx-elastic-beanstalk/master/nginx/proxy.conf
 
 echo 'Making sure that nginx starts on startup'
 /sbin/chkconfig nginx on

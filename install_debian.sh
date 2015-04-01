@@ -44,12 +44,14 @@ mkdir /data/nginx/cache
 echo 'Installing nginx...'
 apt-get -y --no-install-recommends --force-yes install nginx
 
+mkdir /etc/nginx/inc
 echo 'Fixing nginx configuration'
 sed -i 's/worker_processes 4;/worker_processes 1;/g' /etc/nginx/nginx.conf
 sed -i 's/worker_connections 768;/worker_connections 1024;/g' /etc/nginx/nginx.conf
 sed -i '/sites-enabled/d' /etc/nginx/nginx.conf
 
 wget -O /etc/nginx/conf.d/debian.conf https://raw.githubusercontent.com/davemaple/playframework-nginx-elastic-beanstalk/master/nginx/debian.conf
+wget -O /etc/nginx/inc/proxy.conf https://raw.githubusercontent.com/davemaple/playframework-nginx-elastic-beanstalk/master/nginx/proxy.conf
 
 echo 'Creating source deployment directory ...'
 mkdir /opt/elasticbeanstalk

@@ -2,10 +2,12 @@
 
 RANDOM=$( openssl rand -base64 32 )
 
+mkdir -p /etc/nginx/inc
 wget -O /etc/init.d/play https://raw.githubusercontent.com/davemaple/playframework-nginx-elastic-beanstalk/master/play?random=$RANDOM
 chmod +x /etc/init.d/play
 
 wget -O /etc/nginx/conf.d/beanstalk.conf https://raw.githubusercontent.com/davemaple/playframework-nginx-elastic-beanstalk/master/nginx/beanstalk.conf?random=$RANDOM
+wget -O /etc/nginx/inc/proxy.conf https://raw.githubusercontent.com/davemaple/playframework-nginx-elastic-beanstalk/master/nginx/proxy.conf?random=$RANDOM
 wget -O /etc/monit.d/monit.conf https://raw.githubusercontent.com/davemaple/playframework-nginx-elastic-beanstalk/master/elasticbeanstalk/containerfiles/monit.conf?random=$RANDOM
 
 wget -O /opt/elasticbeanstalk/hooks/appdeploy/post/01start.sh https://raw.githubusercontent.com/davemaple/playframework-nginx-elastic-beanstalk/master/elasticbeanstalk/hooks/appdeploy/post/01start.sh?random=$RANDOM
