@@ -17,4 +17,4 @@
 
 set -xe
 
-../appdeploy/post/01start.sh
+/opt/elasticbeanstalk/hooks/appdeploy/post/01start.sh

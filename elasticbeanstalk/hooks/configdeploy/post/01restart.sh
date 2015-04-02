@@ -18,5 +18,5 @@ set -xe
 
 if [[ "$EB_SYSTEM_STARTUP" != "true" ]];
 then
-  monit play restart
+	/opt/elasticbeanstalk/hooks/appdeploy/post/01start.sh
 fi
