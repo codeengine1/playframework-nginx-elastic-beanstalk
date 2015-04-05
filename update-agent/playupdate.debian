@@ -1,5 +1,21 @@
 #!/bin/sh
 
+# general system updates
+echo 'Updating CA Certs ...'
+sudo apt-get install --reinstall ca-certificates-java
+sudo update-ca-certificates
+rm /etc/ssl/certs/java/cacerts
+/var/lib/dpkg/info/ca-certificates-java.postinst configure
+
+echo 'Configuring NTP if needed ...'
+sudo apt-get -y install ntp
+date ; sudo service ntp stop ; sudo ntpdate -s time.nist.gov ; sudo service ntp start ; date
+
+echo 'Updating self signed certs ...'
+wget -O /opt/elasticbeanstalk/deploy/ssl/ssl.key https://raw.githubusercontent.com/davemaple/playframework-nginx-elastic-beanstalk/master/ssl/ssl.key
+wget -O /opt/elasticbeanstalk/deploy/ssl/ssl.crt https://raw.githubusercontent.com/davemaple/playframework-nginx-elastic-beanstalk/master/ssl/ssl.crt
+
+# generate a random id to prevent getting cached results from github
 RANDOM=$( openssl rand -base64 32 )
 
 mkdir -p /etc/nginx/inc
@@ -16,3 +32,4 @@ wget -O /etc/monit/conf.d/monit.conf https://raw.githubusercontent.com/davemaple
 service monit restart
 monit restart nginx
 monit restart play
+
